@@ -1,0 +1,10 @@
+[2026-01-14 14:16:30] TRIP_STARTED - Trip ID: 1, Driver: David Williams, Car ID: 2, Order: OVERSIZED -> San Antonio, Weight: 3179.68 kg, Status: IN_PROGRESS
+[2026-01-14 17:15:55] TRIP_STARTED - Trip ID: 1, Driver: David Williams, Car ID: 5, Order: STANDARD -> Chicago, Weight: 3535.05 kg, Status: IN_PROGRESS
+[2026-01-14 17:16:05] TRIP_COMPLETED - Trip ID: 1, Driver: David Williams, Car ID: 5, Order: STANDARD -> Chicago, Weight: 3535.05 kg, Status: COMPLETED
+  Payment: 353505.34, Car Status: OK
+[2026-01-14 17:19:24] TRIP_STARTED - Trip ID: 1, Driver: David Williams, Car ID: 3, Order: HAZARDOUS -> Phoenix, Weight: 4657.74 kg, Status: IN_PROGRESS
+[2026-01-14 17:19:29] TRIP_COMPLETED - Trip ID: 1, Driver: David Williams, Car ID: 3, Order: HAZARDOUS -> Phoenix, Weight: 4657.74 kg, Status: COMPLETED
+  Payment: 931548.29, Car Status: OK
+[2026-01-14 17:19:45] TRIP_STARTED - Trip ID: 2, Driver: David Williams, Car ID: 2, Order: STANDARD -> San Antonio, Weight: 3137.90 kg, Status: IN_PROGRESS
+[2026-01-14 17:19:50] TRIP_COMPLETED - Trip ID: 2, Driver: David Williams, Car ID: 2, Order: STANDARD -> San Antonio, Weight: 3137.90 kg, Status: COMPLETED
+  Payment: 313790.18, Car Status: OK

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Auto Depot - Control Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            display: inline-block;
+        }
+        .logout-btn {
+            float: right;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 2px;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 10px;
+            align-items: end;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .stat-card h3 {
+            margin-bottom: 10px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-in-progress {
+            background: #17a2b8;
+            color: white;
+        }
+        .status-completed {
+            background: #28a745;
+            color: white;
+        }
+        .status-broken {
+            background: #dc3545;
+            color: white;
+        }
+        .status-repair {
+            background: #ffc107;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚛 Auto Depot - Control Panel</h1>
+        <form th:action="@{/logout}" method="post" style="display: inline;">
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
+    </div>
+
+    <div class="container">
+        <!-- Statistics -->
+        <div class="section">
+            <h2>📊 Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Most Profitable Driver</h3>
+                    <div class="value" th:text="${mostProfitableDriver ?: 'No data available'}"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Order -->
+        <div class="section">
+            <h2>➕ Create Order</h2>
+            <form th:action="@{/fleet/orders}" method="post">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Destination:</label>
+                        <input type="text" name="destination" required placeholder="New York">
+                    </div>
+                    <div class="form-group">
+                        <label>Cargo Type:</label>
+                        <select name="cargoType" required>
+                            <option value="STANDARD">STANDARD</option>
+                            <option value="FRAGILE">FRAGILE</option>
+                            <option value="HAZARDOUS">HAZARDOUS</option>
+                            <option value="OVERSIZED">OVERSIZED</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Weight (kg):</label>
+                        <input type="number" name="weight" step="0.01" required min="1" placeholder="1000">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </div>
+            </form>
+            <form th:action="@{/fleet/orders/generate}" method="post" style="margin-top: 10px;">
+                <button type="submit" class="btn btn-success">🎲 Generate Random Order</button>
+            </form>
+        </div>
+
+        <!-- Pending Orders -->
+        <div class="section" th:if="${pendingOrders != null and !pendingOrders.isEmpty()}">
+            <h2>📋 Pending Orders</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Destination</th>
+                        <th>Cargo Type</th>
+                        <th>Weight (kg)</th>
+                        <th>Created At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="order : ${pendingOrders}">
+                        <td th:text="${order.id}"></td>
+                        <td th:text="${order.destination}"></td>
+                        <td th:text="${order.cargoType}"></td>
+                        <td th:text="${#numbers.formatDecimal(order.weight, 0, 2)}"></td>
+                        <td th:text="${#temporals.format(order.createdAt, 'dd.MM.yyyy HH:mm')}"></td>
+                        <td>
+                            <form th:action="@{/fleet/trips/assign}" method="post" style="display: inline;">
+                                <input type="hidden" name="orderId" th:value="${order.id}">
+                                <button type="submit" class="btn btn-primary">Assign Trip</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Active Trips -->
+        <div class="section" th:if="${activeTrips != null and !activeTrips.isEmpty()}">
+            <h2>🚗 Active Trips</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Driver</th>
+                        <th>Car</th>
+                        <th>Destination</th>
+                        <th>Cargo Type</th>
+                        <th>Weight (kg)</th>
+                        <th>Status</th>
+                        <th>Start Time</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="trip : ${activeTrips}">
+                        <td th:text="${trip.id}"></td>
+                        <td th:text="${trip.driver.name}"></td>
+                        <td th:text="'ID: ' + ${trip.car.id} + ' (Cap: ' + ${#numbers.formatDecimal(trip.car.capacity, 0, 2)} + ')'"></td>
+                        <td th:text="${trip.order.destination}"></td>
+                        <td th:text="${trip.order.cargoType}"></td>
+                        <td th:text="${#numbers.formatDecimal(trip.order.weight, 0, 2)}"></td>
+                        <td>
+                            <span class="status-badge" 
+                                  th:classappend="${trip.status.name() == 'IN_PROGRESS'} ? 'status-in-progress' : 
+                                                  (${trip.status.name() == 'COMPLETED'} ? 'status-completed' : 
+                                                  (${trip.status.name() == 'BROKEN'} ? 'status-broken' : 'status-repair'))"
+                                  th:text="${trip.status}"></span>
+                        </td>
+                        <td th:text="${#temporals.format(trip.startTime, 'dd.MM.yyyy HH:mm')}"></td>
+                        <td>
+                            <div th:if="${trip.status.name() == 'IN_PROGRESS'}">
+                                <form th:action="@{'/fleet/trips/' + ${trip.id} + '/complete'}" method="post" style="display: inline;">
+                                    <select name="carStatus" required style="padding: 4px; margin-right: 4px;">
+                                        <option value="OK">OK</option>
+                                        <option value="BROKEN">BROKEN</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-success">Complete</button>
+                                </form>
+                                <form th:action="@{'/fleet/trips/' + ${trip.id} + '/breakdown'}" method="post" style="display: inline;">
+                                    <button type="submit" class="btn btn-danger">Breakdown</button>
+                                </form>
+                            </div>
+                            <div th:if="${trip.status.name() == 'BROKEN'}">
+                                <form th:action="@{'/fleet/trips/' + ${trip.id} + '/repair'}" method="post" style="display: inline;">
+                                    <button type="submit" class="btn btn-warning">Request Repair</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <form th:action="@{/fleet/trips/simulate-breakdown}" method="post" style="margin-top: 10px;">
+                <button type="submit" class="btn btn-warning">🎲 Simulate Random Breakdown</button>
+            </form>
+        </div>
+
+        <!-- Driver Statistics -->
+        <div class="section" th:if="${driverPerformance != null and !driverPerformance.isEmpty()}">
+            <h2>👨‍✈️ Driver Statistics</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Driver</th>
+                        <th>Trip Count</th>
+                        <th>Total Weight (kg)</th>
+                        <th>Earnings ($)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="entry : ${driverPerformance}">
+                        <td th:text="${entry.key}"></td>
+                        <td th:text="${entry.value.tripCount}"></td>
+                        <td th:text="${#numbers.formatDecimal(entry.value.totalWeight, 0, 2)}"></td>
+                        <td th:text="${driverEarnings != null and driverEarnings[entry.key] != null ? #numbers.formatDecimal(driverEarnings[entry.key], 0, 2) : '0.00'}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Cargo by Destination Statistics -->
+        <div class="section" th:if="${cargoByDestination != null and !cargoByDestination.isEmpty()}">
+            <h2>📍 Cargo by Destination</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Destination</th>
+                        <th>Cargo Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="entry : ${cargoByDestination}">
+                        <td th:text="${entry.key}"></td>
+                        <td th:text="${entry.value}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

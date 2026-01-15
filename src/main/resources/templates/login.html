@@ -74,10 +74,10 @@
             </div>
             <button type="submit">Login</button>
             <div th:if="${param.error}" class="error">
-                Invalid username or password
+                Wrong username or password
             </div>
             <div th:if="${param.logout}" class="error" style="color: green;">
-                You have been logged out successfully
+                You logged out
             </div>
         </form>
     </div>

@@ -8,3 +8,39 @@
 [2026-01-14 17:19:45] TRIP_STARTED - Trip ID: 2, Driver: David Williams, Car ID: 2, Order: STANDARD -> San Antonio, Weight: 3137.90 kg, Status: IN_PROGRESS
 [2026-01-14 17:19:50] TRIP_COMPLETED - Trip ID: 2, Driver: David Williams, Car ID: 2, Order: STANDARD -> San Antonio, Weight: 3137.90 kg, Status: COMPLETED
   Payment: 313790.18, Car Status: OK
+[2026-01-14 17:56:05] REPAIR_REQUESTED - Trip ID: 1, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: REPAIR_REQUESTED
+[2026-01-14 17:56:05] TRIP_COMPLETED - Trip ID: 1, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: COMPLETED
+  Payment: 100000.00, Car Status: OK
+[2026-01-14 17:56:06] TRIP_STARTED - Trip ID: null, Driver: Senior Driver, Car ID: 1, Order: HAZARDOUS -> Los Angeles, Weight: 1000.00 kg, Status: IN_PROGRESS
+[2026-01-14 17:56:06] BREAKDOWN - Trip ID: 1, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: BROKEN
+[2026-01-14 17:56:06] TRIP_STARTED - Trip ID: null, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: IN_PROGRESS
+[2026-01-14 18:07:08] REPAIR_REQUESTED - Trip ID: 1, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: REPAIR_REQUESTED
+[2026-01-14 18:07:09] TRIP_COMPLETED - Trip ID: 1, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: COMPLETED
+  Payment: 100000.00, Car Status: OK
+[2026-01-14 18:07:09] TRIP_STARTED - Trip ID: null, Driver: Senior Driver, Car ID: 1, Order: HAZARDOUS -> Los Angeles, Weight: 1000.00 kg, Status: IN_PROGRESS
+[2026-01-14 18:07:09] BREAKDOWN - Trip ID: 1, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: BROKEN
+[2026-01-14 18:07:09] TRIP_STARTED - Trip ID: null, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: IN_PROGRESS
+[2026-01-14 18:10:13] REPAIR_REQUESTED - Trip ID: 1, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: REPAIR_REQUESTED
+[2026-01-14 18:10:13] TRIP_COMPLETED - Trip ID: 1, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: COMPLETED
+  Payment: 100000.00, Car Status: OK
+[2026-01-14 18:10:13] TRIP_STARTED - Trip ID: null, Driver: Senior Driver, Car ID: 1, Order: HAZARDOUS -> Los Angeles, Weight: 1000.00 kg, Status: IN_PROGRESS
+[2026-01-14 18:10:13] BREAKDOWN - Trip ID: 1, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: BROKEN
+[2026-01-14 18:10:13] TRIP_STARTED - Trip ID: null, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: IN_PROGRESS
+[2026-01-14 18:14:38] REPAIR_REQUESTED - Trip ID: 1, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: REPAIR_REQUESTED
+[2026-01-14 18:14:38] TRIP_COMPLETED - Trip ID: 1, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: COMPLETED
+  Payment: 100000.00, Car Status: OK
+[2026-01-14 18:14:38] TRIP_STARTED - Trip ID: null, Driver: Senior Driver, Car ID: 1, Order: HAZARDOUS -> Los Angeles, Weight: 1000.00 kg, Status: IN_PROGRESS
+[2026-01-14 18:14:38] BREAKDOWN - Trip ID: 1, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: BROKEN
+[2026-01-14 18:14:38] TRIP_STARTED - Trip ID: null, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: IN_PROGRESS
+[2026-01-14 18:17:20] REPAIR_REQUESTED - Trip ID: 1, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: REPAIR_REQUESTED
+[2026-01-14 18:17:20] TRIP_COMPLETED - Trip ID: 1, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: COMPLETED
+  Payment: 100000.00, Car Status: OK
+[2026-01-14 18:17:20] TRIP_STARTED - Trip ID: null, Driver: Senior Driver, Car ID: 1, Order: HAZARDOUS -> Los Angeles, Weight: 1000.00 kg, Status: IN_PROGRESS
+[2026-01-14 18:17:20] BREAKDOWN - Trip ID: 1, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: BROKEN
+[2026-01-14 18:17:20] TRIP_STARTED - Trip ID: null, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: IN_PROGRESS
+[2026-01-14 18:21:43] REPAIR_REQUESTED - Trip ID: 1, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: REPAIR_REQUESTED
+[2026-01-14 18:21:43] TRIP_COMPLETED - Trip ID: 1, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: COMPLETED
+  Payment: 100000.00, Car Status: OK
+[2026-01-14 18:21:43] TRIP_STARTED - Trip ID: null, Driver: Senior Driver, Car ID: 1, Order: HAZARDOUS -> Los Angeles, Weight: 1000.00 kg, Status: IN_PROGRESS
+[2026-01-14 18:21:44] BREAKDOWN - Trip ID: 1, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: BROKEN
+[2026-01-14 18:21:44] TRIP_STARTED - Trip ID: null, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: IN_PROGRESS

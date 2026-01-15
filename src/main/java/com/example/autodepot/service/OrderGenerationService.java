@@ -27,14 +27,14 @@ public class OrderGenerationService {
         this.orderRepository = orderRepository;
     }
 
-    @Scheduled(cron = "0 0 9 * * ?") // Every day at 9:00
+    @Scheduled(cron = "0 0 9 * * ?")
     public void generateDailyOrders() {
-        int orderCount = random.nextInt(5) + 3; // From 3 to 7 orders per day
+        int orderCount = random.nextInt(5) + 3;
 
         for (int i = 0; i < orderCount; i++) {
             String destination = DESTINATIONS.get(random.nextInt(DESTINATIONS.size()));
             String cargoType = CARGO_TYPES.get(random.nextInt(CARGO_TYPES.size()));
-            double weight = 500 + random.nextDouble() * 4500; // From 500 to 5000 kg
+            double weight = 500 + random.nextDouble() * 4500;
 
             Order order = new Order(destination, cargoType, weight);
             orderRepository.save(order);

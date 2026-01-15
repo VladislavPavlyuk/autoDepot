@@ -35,7 +35,7 @@ public class TripService {
     private static final String LOG_FILE = "trips.log";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    // Minimum experience required for different cargo types
+    // Different cargo types need drivers with different experience years
     private static final Map<String, Integer> CARGO_TYPE_REQUIREMENTS = Map.of(
         "FRAGILE", 5,
         "HAZARDOUS", 10,
@@ -56,7 +56,6 @@ public class TripService {
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
 
-        // Select driver based on experience required for cargo type
         Integer requiredExperience = CARGO_TYPE_REQUIREMENTS.getOrDefault(
             order.getCargoType().toUpperCase(), 1);
         
@@ -69,7 +68,6 @@ public class TripService {
             throw new RuntimeException("No available drivers with required experience: " + requiredExperience);
         }
 
-        // Optimize car selection: minimize difference between capacity and weight
         List<Car> availableCars = carRepo.findByIsBrokenFalse().stream()
             .filter(c -> c.getCapacity() >= order.getWeight())
             .sorted(Comparator.comparing(c -> Math.abs(c.getCapacity() - order.getWeight())))
@@ -131,7 +129,7 @@ public class TripService {
             throw new RuntimeException("Trip is not in progress");
         }
 
-        // Calculate payment: base rate * weight * cargo type multiplier
+        // Calculate how much money driver gets for this trip
         double baseRate = 100.0;
         Map<String, Double> cargoMultipliers = Map.of(
             "FRAGILE", 1.5,
@@ -149,7 +147,6 @@ public class TripService {
         trip.setCarStatusAfterTrip(carStatus);
         tripRepo.save(trip);
 
-        // Release driver and car
         Driver driver = trip.getDriver();
         driver.setAvailable(true);
         driver.addEarnings(payment);
@@ -170,7 +167,7 @@ public class TripService {
             .filter(t -> t.getStatus() == Trip.TripStatus.IN_PROGRESS)
             .collect(Collectors.toList());
 
-        if (!activeTrips.isEmpty() && random.nextDouble() < 0.1) { // 10% probability
+        if (!activeTrips.isEmpty() && random.nextDouble() < 0.1) {
             Trip trip = activeTrips.get(random.nextInt(activeTrips.size()));
             processBreakdown(trip.getId());
         }

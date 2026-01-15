@@ -29,7 +29,6 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // Create roles
         Role adminRole = roleRepository.findByName("ADMIN")
             .orElseGet(() -> {
                 Role role = new Role("ADMIN");
@@ -42,7 +41,6 @@ public class DataInitializer implements CommandLineRunner {
                 return roleRepository.save(role);
             });
 
-        // Create user
         if (userRepository.findByUsername("admin").isEmpty()) {
             User admin = new User();
             admin.setUsername("admin");
@@ -54,7 +52,6 @@ public class DataInitializer implements CommandLineRunner {
             userRepository.save(admin);
         }
 
-        // Create drivers
         if (driverRepository.count() == 0) {
             driverRepository.save(new Driver("John Smith", 12));
             driverRepository.save(new Driver("Michael Johnson", 8));
@@ -63,7 +60,6 @@ public class DataInitializer implements CommandLineRunner {
             driverRepository.save(new Driver("James Davis", 6));
         }
 
-        // Create cars
         if (carRepository.count() == 0) {
             carRepository.save(new Car(2000.0));
             carRepository.save(new Car(3500.0));

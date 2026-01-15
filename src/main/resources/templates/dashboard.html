@@ -179,27 +179,25 @@
 </head>
 <body>
     <div class="header">
-        <h1>🚛 Auto Depot - Control Panel</h1>
+        <h1>🚛 Auto Depot</h1>
         <form th:action="@{/logout}" method="post" style="display: inline;">
             <button type="submit" class="logout-btn">Logout</button>
         </form>
     </div>
 
     <div class="container">
-        <!-- Statistics -->
         <div class="section">
             <h2>📊 Statistics</h2>
             <div class="stats-grid">
                 <div class="stat-card">
-                    <h3>Most Profitable Driver</h3>
+                    <h3>Best Driver</h3>
                     <div class="value" th:text="${mostProfitableDriver ?: 'No data available'}"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Create Order -->
         <div class="section">
-            <h2>➕ Create Order</h2>
+            <h2>➕ New Order</h2>
             <form th:action="@{/fleet/orders}" method="post">
                 <div class="form-row">
                     <div class="form-group">
@@ -225,13 +223,12 @@
                 </div>
             </form>
             <form th:action="@{/fleet/orders/generate}" method="post" style="margin-top: 10px;">
-                <button type="submit" class="btn btn-success">🎲 Generate Random Order</button>
+                <button type="submit" class="btn btn-success">🎲 Random Order</button>
             </form>
         </div>
 
-        <!-- Pending Orders -->
         <div class="section" th:if="${pendingOrders != null and !pendingOrders.isEmpty()}">
-            <h2>📋 Pending Orders</h2>
+            <h2>📋 Waiting Orders</h2>
             <table>
                 <thead>
                     <tr>
@@ -253,7 +250,7 @@
                         <td>
                             <form th:action="@{/fleet/trips/assign}" method="post" style="display: inline;">
                                 <input type="hidden" name="orderId" th:value="${order.id}">
-                                <button type="submit" class="btn btn-primary">Assign Trip</button>
+                                <button type="submit" class="btn btn-primary">Start Trip</button>
                             </form>
                         </td>
                     </tr>
@@ -261,9 +258,8 @@
             </table>
         </div>
 
-        <!-- Active Trips -->
         <div class="section" th:if="${activeTrips != null and !activeTrips.isEmpty()}">
-            <h2>🚗 Active Trips</h2>
+            <h2>🚗 Trips</h2>
             <table>
                 <thead>
                     <tr>
@@ -317,13 +313,12 @@
                 </tbody>
             </table>
             <form th:action="@{/fleet/trips/simulate-breakdown}" method="post" style="margin-top: 10px;">
-                <button type="submit" class="btn btn-warning">🎲 Simulate Random Breakdown</button>
+                <button type="submit" class="btn btn-warning">🎲 Random Breakdown</button>
             </form>
         </div>
 
-        <!-- Driver Statistics -->
         <div class="section" th:if="${driverPerformance != null and !driverPerformance.isEmpty()}">
-            <h2>👨‍✈️ Driver Statistics</h2>
+            <h2>👨‍✈️ Drivers</h2>
             <table>
                 <thead>
                     <tr>
@@ -344,9 +339,8 @@
             </table>
         </div>
 
-        <!-- Cargo by Destination Statistics -->
         <div class="section" th:if="${cargoByDestination != null and !cargoByDestination.isEmpty()}">
-            <h2>📍 Cargo by Destination</h2>
+            <h2>📍 Destinations</h2>
             <table>
                 <thead>
                     <tr>

@@ -1,92 +1,86 @@
 package com.example.autodepot.repository;
 
-import com.example.autodepot.entity.*;
+import com.example.autodepot.AbstractPostgresTest;
+import com.example.autodepot.entity.Car;
+import com.example.autodepot.entity.Driver;
+import com.example.autodepot.entity.Order;
+import com.example.autodepot.entity.Trip;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
-class TripRepositoryTest {
+@SpringBootTest
+class TripRepositoryTest extends AbstractPostgresTest {
 
-    @Mock
+    @Autowired
     private TripRepository tripRepository;
 
-    @Mock
+    @Autowired
     private DriverRepository driverRepository;
 
-    @Mock
+    @Autowired
     private CarRepository carRepository;
 
-    @Mock
+    @Autowired
     private OrderRepository orderRepository;
 
     @Test
     void testSaveAndFindTrip() {
-        // Arrange
-        Driver driver = new Driver("John Smith", 5);
-        driver.setId(1L);
-
-        Car car = new Car(2000.0);
-        car.setId(1L);
-
-        Order order = new Order("New York", "STANDARD", 1000.0);
-        order.setId(1L);
+        Driver driver = driverRepository.save(new Driver("John Smith", 5));
+        Car car = carRepository.save(new Car(2000.0));
+        Order order = orderRepository.save(new Order("New York", "STANDARD", 1000.0));
 
         Trip trip = new Trip(order, driver, car);
-        trip.setId(1L);
         trip.setStatus(Trip.TripStatus.IN_PROGRESS);
-
-        when(tripRepository.save(any(Trip.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(tripRepository.findById(1L)).thenReturn(Optional.of(trip));
-
-        // Act
         Trip saved = tripRepository.save(trip);
-        Trip found = tripRepository.findById(1L).orElse(null);
+        Trip found = tripRepository.findById(saved.getId()).orElse(null);
 
-        // Assert
         assertNotNull(found);
-        assertEquals(trip.getId(), found.getId());
-        assertEquals(trip.getOrder().getId(), found.getOrder().getId());
-        assertEquals(trip.getDriver().getId(), found.getDriver().getId());
-        assertEquals(trip.getCar().getId(), found.getCar().getId());
+        assertEquals(saved.getId(), found.getId());
+        assertEquals(order.getId(), found.getOrder().getId());
+        assertEquals(driver.getId(), found.getDriver().getId());
+        assertEquals(car.getId(), found.getCar().getId());
     }
 
     @Test
     void testExistsByOrderId() {
-        // Arrange
-        when(tripRepository.existsByOrderId(1L)).thenReturn(true);
-        when(tripRepository.existsByOrderId(999L)).thenReturn(false);
+        Driver driver = driverRepository.save(new Driver("John Smith", 5));
+        Car car = carRepository.save(new Car(2000.0));
+        Order order = orderRepository.save(new Order("New York", "STANDARD", 1000.0));
 
-        // Act
-        boolean exists = tripRepository.existsByOrderId(1L);
-        boolean notExists = tripRepository.existsByOrderId(999L);
+        Trip trip = new Trip(order, driver, car);
+        trip.setStatus(Trip.TripStatus.IN_PROGRESS);
+        tripRepository.save(trip);
 
-        // Assert
-        assertTrue(exists);
-        assertFalse(notExists);
+        assertTrue(tripRepository.existsByOrderId(order.getId()));
+        assertFalse(tripRepository.existsByOrderId(999999L));
     }
 
     @Test
     void testFindStatsByDriver() {
-        // Arrange
-        Object[] stat1 = new Object[]{"John Smith", 2L, 3000.0};
-        Object[] stat2 = new Object[]{"Michael Johnson", 1L, 1000.0};
-        when(tripRepository.findStatsByDriver()).thenReturn(List.of(stat1, stat2));
+        Driver driver = driverRepository.save(new Driver("John Smith", 5));
+        Car car = carRepository.save(new Car(2000.0));
+        Order order1 = orderRepository.save(new Order("New York", "STANDARD", 1000.0));
+        Order order2 = orderRepository.save(new Order("Chicago", "STANDARD", 2000.0));
 
-        // Act
+        Trip trip1 = new Trip(order1, driver, car);
+        trip1.setStatus(Trip.TripStatus.COMPLETED);
+        tripRepository.save(trip1);
+
+        Trip trip2 = new Trip(order2, driver, car);
+        trip2.setStatus(Trip.TripStatus.COMPLETED);
+        tripRepository.save(trip2);
+
         List<Object[]> stats = tripRepository.findStatsByDriver();
 
-        // Assert
         assertNotNull(stats);
-        assertEquals(2, stats.size());
+        assertEquals(1, stats.size());
         assertEquals("John Smith", stats.get(0)[0]);
+        assertEquals(2L, stats.get(0)[1]);
+        assertEquals(3000.0, ((Number) stats.get(0)[2]).doubleValue());
     }
 }

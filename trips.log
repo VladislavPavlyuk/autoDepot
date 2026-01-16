@@ -56,3 +56,12 @@
   Payment: 435942.28, Car Status: OK
 [2026-01-16 12:38:04] TRIP_COMPLETED - Trip ID: 2, Driver: John Smith, Car ID: 1, Order: FRAGILE -> Houston, Weight: 1634.21 kg, Status: COMPLETED
   Payment: 245132.08, Car Status: OK
+[2026-01-16 12:53:22] TRIP_STARTED - Trip ID: 1, Driver: David Williams, Car ID: 2, Order: FRAGILE -> New York, Weight: 3486.78 kg, Status: IN_PROGRESS
+[2026-01-16 12:53:28] TRIP_STARTED - Trip ID: 2, Driver: John Smith, Car ID: 4, Order: STANDARD -> Chicago, Weight: 746.94 kg, Status: IN_PROGRESS
+[2026-01-16 12:53:31] TRIP_STARTED - Trip ID: 3, Driver: Michael Johnson, Car ID: 2, Order: OVERSIZED -> New York, Weight: 3075.29 kg, Status: IN_PROGRESS
+[2026-01-16 12:53:34] TRIP_COMPLETED - Trip ID: 1, Driver: David Williams, Car ID: 2, Order: FRAGILE -> New York, Weight: 3486.78 kg, Status: COMPLETED
+  Payment: 523017.29, Car Status: OK
+[2026-01-16 12:53:36] BREAKDOWN - Trip ID: 2, Driver: John Smith, Car ID: 4, Order: STANDARD -> Chicago, Weight: 746.94 kg, Status: BROKEN
+[2026-01-16 12:53:38] REPAIR_REQUESTED - Trip ID: 2, Driver: John Smith, Car ID: 4, Order: STANDARD -> Chicago, Weight: 746.94 kg, Status: REPAIR_REQUESTED
+[2026-01-16 12:53:40] TRIP_COMPLETED - Trip ID: 3, Driver: Michael Johnson, Car ID: 2, Order: OVERSIZED -> New York, Weight: 3075.29 kg, Status: COMPLETED
+  Payment: 399787.82, Car Status: OK

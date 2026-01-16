@@ -35,7 +35,7 @@ public class StatsService {
     public Map<String, Object> getAllStats() {
         Map<String, Object> allStats = new HashMap<>();
         for (Map.Entry<StatsKey, StatsAggregator> entry : statsKeyRegistry.getAll().entrySet()) {
-            allStats.put(toResponseKey(entry.getKey()), entry.getValue().aggregate());
+            allStats.put(entry.getKey().getResponseKey(), entry.getValue().aggregate());
         }
         return allStats;
     }
@@ -59,12 +59,4 @@ public class StatsService {
         return type.cast(value);
     }
 
-    private String toResponseKey(StatsKey key) {
-        return switch (key) {
-            case DRIVER_PERFORMANCE -> "driverPerformance";
-            case CARGO_BY_DESTINATION -> "cargoByDestination";
-            case DRIVER_EARNINGS -> "driverEarnings";
-            case MOST_PROFITABLE_DRIVER -> "mostProfitableDriver";
-        };
-    }
 }

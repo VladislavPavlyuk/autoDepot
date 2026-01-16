@@ -3,11 +3,11 @@ package com.example.autodepot.controller;
 import com.example.autodepot.dto.OrderDTO;
 import com.example.autodepot.entity.Order;
 import com.example.autodepot.entity.Trip;
-import com.example.autodepot.repository.OrderRepository;
-import com.example.autodepot.repository.TripRepository;
 import com.example.autodepot.service.OrderGenerationService;
 import com.example.autodepot.service.StatsService;
 import com.example.autodepot.service.TripService;
+import com.example.autodepot.service.data.OrderService;
+import com.example.autodepot.service.data.TripDataService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -21,17 +21,17 @@ import java.util.Map;
 public class FleetController {
     private final TripService tripService;
     private final StatsService statsService;
-    private final OrderRepository orderRepository;
-    private final TripRepository tripRepository;
+    private final OrderService orderService;
+    private final TripDataService tripDataService;
     private final OrderGenerationService orderGenerationService;
 
     public FleetController(TripService tripService, StatsService statsService, 
-                           OrderRepository orderRepository, TripRepository tripRepository,
+                           OrderService orderService, TripDataService tripDataService,
                            OrderGenerationService orderGenerationService) {
         this.tripService = tripService;
         this.statsService = statsService;
-        this.orderRepository = orderRepository;
-        this.tripRepository = tripRepository;
+        this.orderService = orderService;
+        this.tripDataService = tripDataService;
         this.orderGenerationService = orderGenerationService;
     }
 
@@ -40,13 +40,13 @@ public class FleetController {
         Map<String, Object> allStats = statsService.getAllStats();
         model.addAllAttributes(allStats);
         
-        List<Order> allOrders = orderRepository.findAll();
+        List<Order> allOrders = orderService.findAll();
         List<Order> pendingOrders = allOrders.stream()
-            .filter(o -> !tripRepository.existsByOrderId(o.getId()))
+            .filter(o -> !tripDataService.existsByOrderId(o.getId()))
             .toList();
         model.addAttribute("pendingOrders", pendingOrders);
         
-        List<Trip> activeTrips = tripRepository.findAll().stream()
+        List<Trip> activeTrips = tripDataService.findAll().stream()
             .filter(t -> t.getStatus() == Trip.TripStatus.IN_PROGRESS || 
                         t.getStatus() == Trip.TripStatus.BROKEN ||
                         t.getStatus() == Trip.TripStatus.REPAIR_REQUESTED)
@@ -61,7 +61,7 @@ public class FleetController {
         Order order = new Order(orderDTO.getDestination(), 
                                orderDTO.getCargoType(), 
                                orderDTO.getWeight());
-        orderRepository.save(order);
+        orderService.save(order);
         return "redirect:/fleet/dashboard";
     }
 

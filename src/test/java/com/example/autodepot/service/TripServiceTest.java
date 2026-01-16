@@ -4,10 +4,10 @@ import com.example.autodepot.entity.Car;
 import com.example.autodepot.entity.Driver;
 import com.example.autodepot.entity.Order;
 import com.example.autodepot.entity.Trip;
-import com.example.autodepot.repository.CarRepository;
-import com.example.autodepot.repository.DriverRepository;
-import com.example.autodepot.repository.OrderRepository;
-import com.example.autodepot.repository.TripRepository;
+import com.example.autodepot.service.data.CarService;
+import com.example.autodepot.service.data.DriverService;
+import com.example.autodepot.service.data.OrderService;
+import com.example.autodepot.service.data.TripDataService;
 import com.example.autodepot.service.logging.TripEventLogger;
 import com.example.autodepot.service.payment.PaymentCalculator;
 import com.example.autodepot.service.selection.CarSelectionPolicy;
@@ -34,16 +34,16 @@ import static org.mockito.Mockito.*;
 class TripServiceTest {
 
     @Mock
-    private DriverRepository driverRepo;
+    private DriverService driverService;
 
     @Mock
-    private CarRepository carRepo;
+    private CarService carService;
 
     @Mock
-    private TripRepository tripRepo;
+    private TripDataService tripDataService;
 
     @Mock
-    private OrderRepository orderRepository;
+    private OrderService orderService;
 
     @Mock
     private DriverSelectionPolicy driverSelectionPolicy;
@@ -84,31 +84,31 @@ class TripServiceTest {
     @Test
     void testCreateTrip_Success() {
         // Arrange
-        when(orderRepository.findById(1L)).thenReturn(Optional.of(testOrder));
-        when(driverRepo.findByIsAvailableTrue()).thenReturn(List.of(testDriver));
-        when(carRepo.findByIsBrokenFalse()).thenReturn(List.of(testCar));
+        when(orderService.findById(1L)).thenReturn(Optional.of(testOrder));
+        when(driverService.findAvailableDrivers()).thenReturn(List.of(testDriver));
+        when(carService.findAvailableCars()).thenReturn(List.of(testCar));
         when(driverSelectionPolicy.selectDriver(eq(testOrder), anyList()))
             .thenReturn(Optional.of(testDriver));
         when(carSelectionPolicy.selectCar(eq(testOrder), anyList()))
             .thenReturn(Optional.of(testCar));
-        when(tripRepo.save(any(Trip.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(driverRepo.save(any(Driver.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(tripDataService.save(any(Trip.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(driverService.save(any(Driver.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
         assertDoesNotThrow(() -> tripService.createTrip(1L));
 
         // Assert
-        verify(orderRepository, times(1)).findById(1L);
-        verify(driverRepo, times(1)).findByIsAvailableTrue();
-        verify(carRepo, times(1)).findByIsBrokenFalse();
-        verify(tripRepo, times(1)).save(any(Trip.class));
-        verify(driverRepo, times(1)).save(any(Driver.class));
+        verify(orderService, times(1)).findById(1L);
+        verify(driverService, times(1)).findAvailableDrivers();
+        verify(carService, times(1)).findAvailableCars();
+        verify(tripDataService, times(1)).save(any(Trip.class));
+        verify(driverService, times(1)).save(any(Driver.class));
     }
 
     @Test
     void testCreateTrip_OrderNotFound() {
         // Arrange
-        when(orderRepository.findById(1L)).thenReturn(Optional.empty());
+        when(orderService.findById(1L)).thenReturn(Optional.empty());
 
         // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class, 
@@ -119,8 +119,8 @@ class TripServiceTest {
     @Test
     void testCreateTrip_NoAvailableDrivers() {
         // Arrange
-        when(orderRepository.findById(1L)).thenReturn(Optional.of(testOrder));
-        when(driverRepo.findByIsAvailableTrue()).thenReturn(new ArrayList<>());
+        when(orderService.findById(1L)).thenReturn(Optional.of(testOrder));
+        when(driverService.findAvailableDrivers()).thenReturn(new ArrayList<>());
         when(driverSelectionPolicy.selectDriver(eq(testOrder), anyList()))
             .thenReturn(Optional.empty());
 
@@ -144,21 +144,21 @@ class TripServiceTest {
         seniorDriver.setId(3L);
         seniorDriver.setAvailable(true);
 
-        when(orderRepository.findById(2L)).thenReturn(Optional.of(hazardousOrder));
-        when(driverRepo.findByIsAvailableTrue()).thenReturn(List.of(juniorDriver, seniorDriver));
-        when(carRepo.findByIsBrokenFalse()).thenReturn(List.of(testCar));
+        when(orderService.findById(2L)).thenReturn(Optional.of(hazardousOrder));
+        when(driverService.findAvailableDrivers()).thenReturn(List.of(juniorDriver, seniorDriver));
+        when(carService.findAvailableCars()).thenReturn(List.of(testCar));
         when(driverSelectionPolicy.selectDriver(eq(hazardousOrder), anyList()))
             .thenReturn(Optional.of(seniorDriver));
         when(carSelectionPolicy.selectCar(eq(hazardousOrder), anyList()))
             .thenReturn(Optional.of(testCar));
-        when(tripRepo.save(any(Trip.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(driverRepo.save(any(Driver.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(tripDataService.save(any(Trip.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(driverService.save(any(Driver.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
         tripService.createTrip(2L);
 
         // Assert - Senior driver should be selected (experience >= 10)
-        verify(tripRepo, times(1)).save(argThat(trip -> 
+        verify(tripDataService, times(1)).save(argThat(trip -> 
             trip.getDriver().getExperience() >= 10));
     }
 
@@ -169,23 +169,23 @@ class TripServiceTest {
         trip.setId(1L);
         trip.setStatus(Trip.TripStatus.IN_PROGRESS);
 
-        when(tripRepo.findById(1L)).thenReturn(Optional.of(trip));
+        when(tripDataService.findById(1L)).thenReturn(Optional.of(trip));
         when(paymentCalculator.calculatePayment(eq(testOrder))).thenReturn(123.0);
-        when(tripRepo.save(any(Trip.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(driverRepo.save(any(Driver.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(carRepo.save(any(Car.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(tripDataService.save(any(Trip.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(driverService.save(any(Driver.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(carService.save(any(Car.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
         tripService.completeTrip(1L, "OK");
 
         // Assert
-        verify(tripRepo, times(1)).findById(1L);
-        verify(tripRepo, times(1)).save(argThat(t -> 
+        verify(tripDataService, times(1)).findById(1L);
+        verify(tripDataService, times(1)).save(argThat(t -> 
             t.getStatus() == Trip.TripStatus.COMPLETED && 
             t.getPayment() != null &&
             t.getCarStatusAfterTrip().equals("OK")));
-        verify(driverRepo, times(1)).save(argThat(d -> d.isAvailable()));
-        verify(carRepo, times(1)).save(any(Car.class));
+        verify(driverService, times(1)).save(argThat(d -> d.isAvailable()));
+        verify(carService, times(1)).save(any(Car.class));
     }
 
     @Test
@@ -195,17 +195,17 @@ class TripServiceTest {
         trip.setId(1L);
         trip.setStatus(Trip.TripStatus.IN_PROGRESS);
 
-        when(tripRepo.findById(1L)).thenReturn(Optional.of(trip));
-        when(tripRepo.save(any(Trip.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(carRepo.save(any(Car.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(tripDataService.findById(1L)).thenReturn(Optional.of(trip));
+        when(tripDataService.save(any(Trip.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(carService.save(any(Car.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
         tripService.processBreakdown(1L);
 
         // Assert
-        verify(tripRepo, times(1)).save(argThat(t -> 
+        verify(tripDataService, times(1)).save(argThat(t -> 
             t.getStatus() == Trip.TripStatus.BROKEN));
-        verify(carRepo, times(1)).save(argThat(c -> c.isBroken()));
+        verify(carService, times(1)).save(argThat(c -> c.isBroken()));
     }
 
     @Test
@@ -215,14 +215,14 @@ class TripServiceTest {
         trip.setId(1L);
         trip.setStatus(Trip.TripStatus.BROKEN);
 
-        when(tripRepo.findById(1L)).thenReturn(Optional.of(trip));
-        when(tripRepo.save(any(Trip.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(tripDataService.findById(1L)).thenReturn(Optional.of(trip));
+        when(tripDataService.save(any(Trip.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
         tripService.requestRepair(1L);
 
         // Assert
-        verify(tripRepo, times(1)).save(argThat(t -> 
+        verify(tripDataService, times(1)).save(argThat(t -> 
             t.getStatus() == Trip.TripStatus.REPAIR_REQUESTED));
     }
 }

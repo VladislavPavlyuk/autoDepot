@@ -1,7 +1,7 @@
 package com.example.autodepot.service.stats;
 
 import com.example.autodepot.entity.Driver;
-import com.example.autodepot.repository.DriverRepository;
+import com.example.autodepot.service.data.DriverService;
 import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
@@ -10,10 +10,10 @@ import java.util.Optional;
 
 @Component
 public class MostProfitableDriverStatsAggregator implements StatsAggregator {
-    private final DriverRepository driverRepository;
+    private final DriverService driverService;
 
-    public MostProfitableDriverStatsAggregator(DriverRepository driverRepository) {
-        this.driverRepository = driverRepository;
+    public MostProfitableDriverStatsAggregator(DriverService driverService) {
+        this.driverService = driverService;
     }
 
     @Override
@@ -23,7 +23,7 @@ public class MostProfitableDriverStatsAggregator implements StatsAggregator {
 
     @Override
     public Object aggregate() {
-        List<Driver> drivers = driverRepository.findAll();
+        List<Driver> drivers = driverService.findAll();
         if (drivers.isEmpty()) {
             return "No data available";
         }

@@ -1,6 +1,6 @@
 package com.example.autodepot.security;
 
-import com.example.autodepot.repository.UserRepository;
+import com.example.autodepot.service.data.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,10 +14,10 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    public SecurityConfig(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public SecurityConfig(UserService userService) {
+        this.userService = userService;
     }
 
     @Bean
@@ -48,7 +48,7 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByUsername(username)
+        return username -> userService.findByUsername(username)
             .map(UserPrincipal::new)
             .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }

@@ -1,6 +1,6 @@
 package com.example.autodepot.service.stats;
 
-import com.example.autodepot.repository.TripRepository;
+import com.example.autodepot.service.data.TripDataService;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -9,10 +9,10 @@ import java.util.Map;
 
 @Component
 public class DriverPerformanceStatsAggregator implements StatsAggregator {
-    private final TripRepository tripRepo;
+    private final TripDataService tripDataService;
 
-    public DriverPerformanceStatsAggregator(TripRepository tripRepo) {
-        this.tripRepo = tripRepo;
+    public DriverPerformanceStatsAggregator(TripDataService tripDataService) {
+        this.tripDataService = tripDataService;
     }
 
     @Override
@@ -22,7 +22,7 @@ public class DriverPerformanceStatsAggregator implements StatsAggregator {
 
     @Override
     public Object aggregate() {
-        List<Object[]> stats = tripRepo.findStatsByDriver();
+        List<Object[]> stats = tripDataService.findStatsByDriver();
         Map<String, Object> performance = new HashMap<>();
 
         for (Object[] stat : stats) {

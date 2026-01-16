@@ -1,9 +1,9 @@
 package com.example.autodepot.service;
 
 import com.example.autodepot.entity.Order;
-import com.example.autodepot.repository.OrderRepository;
 import com.example.autodepot.service.generation.OrderCountStrategy;
 import com.example.autodepot.service.generation.OrderGenerator;
+import com.example.autodepot.service.data.OrderService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 class OrderGenerationServiceTest {
 
     @Mock
-    private OrderRepository orderRepository;
+    private OrderService orderService;
 
     @Mock
     private OrderGenerator orderGenerator;
@@ -33,13 +33,13 @@ class OrderGenerationServiceTest {
     void testGenerateRandomOrder() {
         // Arrange
         when(orderGenerator.generate()).thenReturn(new Order("New York", "STANDARD", 1000.0));
-        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(orderService.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
         orderGenerationService.generateRandomOrder();
 
         // Assert
-        verify(orderRepository, times(1)).save(any(Order.class));
+        verify(orderService, times(1)).save(any(Order.class));
     }
 
     @Test
@@ -47,7 +47,7 @@ class OrderGenerationServiceTest {
         // Arrange
         Order generatedOrder = new Order("Chicago", "FRAGILE", 2500.0);
         when(orderGenerator.generate()).thenReturn(generatedOrder);
-        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
+        when(orderService.save(any(Order.class))).thenAnswer(invocation -> {
             Order order = invocation.getArgument(0);
             assertNotNull(order.getDestination());
             assertNotNull(order.getCargoType());
@@ -59,6 +59,6 @@ class OrderGenerationServiceTest {
         orderGenerationService.generateRandomOrder();
 
         // Assert
-        verify(orderRepository, times(1)).save(any(Order.class));
+        verify(orderService, times(1)).save(any(Order.class));
     }
 }

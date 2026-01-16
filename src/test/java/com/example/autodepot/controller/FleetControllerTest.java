@@ -2,15 +2,15 @@ package com.example.autodepot.controller;
 
 import com.example.autodepot.dto.OrderDTO;
 import com.example.autodepot.entity.Order;
-import com.example.autodepot.entity.Trip;
-import com.example.autodepot.repository.OrderRepository;
-import com.example.autodepot.repository.TripRepository;
 import com.example.autodepot.service.OrderGenerationService;
 import com.example.autodepot.service.StatsService;
 import com.example.autodepot.service.TripService;
+import com.example.autodepot.service.data.OrderService;
+import com.example.autodepot.service.data.TripDataService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ui.Model;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.*;
 
@@ -23,20 +23,20 @@ class FleetControllerTest {
     private FleetController fleetController;
     private TripService tripService;
     private StatsService statsService;
-    private OrderRepository orderRepository;
-    private TripRepository tripRepository;
+    private OrderService orderService;
+    private TripDataService tripDataService;
     private OrderGenerationService orderGenerationService;
 
     @BeforeEach
     void setUp() {
         tripService = mock(TripService.class);
         statsService = mock(StatsService.class);
-        orderRepository = mock(OrderRepository.class);
-        tripRepository = mock(TripRepository.class);
+        orderService = mock(OrderService.class);
+        tripDataService = mock(TripDataService.class);
         orderGenerationService = mock(OrderGenerationService.class);
 
         fleetController = new FleetController(
-            tripService, statsService, orderRepository, tripRepository, orderGenerationService
+            tripService, statsService, orderService, tripDataService, orderGenerationService
         );
     }
 
@@ -48,9 +48,9 @@ class FleetControllerTest {
         stats.put("mostProfitableDriver", "John Smith ($500.00)");
         
         when(statsService.getAllStats()).thenReturn(stats);
-        when(orderRepository.findAll()).thenReturn(new ArrayList<>());
-        when(tripRepository.existsByOrderId(anyLong())).thenReturn(false);
-        when(tripRepository.findAll()).thenReturn(new ArrayList<>());
+        when(orderService.findAll()).thenReturn(new ArrayList<>());
+        when(tripDataService.existsByOrderId(anyLong())).thenReturn(false);
+        when(tripDataService.findAll()).thenReturn(new ArrayList<>());
 
         // Act
         String viewName = fleetController.getDashboard(mock(Model.class));
@@ -64,14 +64,14 @@ class FleetControllerTest {
     void testCreateOrder() {
         // Arrange
         OrderDTO orderDTO = new OrderDTO("New York", "STANDARD", 1000.0);
-        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(orderService.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
         String redirect = fleetController.createOrder(orderDTO);
 
         // Assert
         assertEquals("redirect:/fleet/dashboard", redirect);
-        verify(orderRepository, times(1)).save(any(Order.class));
+        verify(orderService, times(1)).save(any(Order.class));
     }
 
     @Test
@@ -87,7 +87,7 @@ class FleetControllerTest {
     @Test
     void testAssignTrip() {
         // Act
-        String redirect = fleetController.assignTrip(1L);
+        String redirect = fleetController.assignTrip(1L, mock(RedirectAttributes.class));
 
         // Assert
         assertEquals("redirect:/fleet/dashboard", redirect);
@@ -97,7 +97,7 @@ class FleetControllerTest {
     @Test
     void testCompleteTrip() {
         // Act
-        String redirect = fleetController.completeTrip(1L, "OK");
+        String redirect = fleetController.completeTrip(1L, "OK", mock(RedirectAttributes.class));
 
         // Assert
         assertEquals("redirect:/fleet/dashboard", redirect);
@@ -107,7 +107,7 @@ class FleetControllerTest {
     @Test
     void testReportBreakdown() {
         // Act
-        String redirect = fleetController.reportBreakdown(1L);
+        String redirect = fleetController.reportBreakdown(1L, mock(RedirectAttributes.class));
 
         // Assert
         assertEquals("redirect:/fleet/dashboard", redirect);
@@ -117,7 +117,7 @@ class FleetControllerTest {
     @Test
     void testRequestRepair() {
         // Act
-        String redirect = fleetController.requestRepair(1L);
+        String redirect = fleetController.requestRepair(1L, mock(RedirectAttributes.class));
 
         // Assert
         assertEquals("redirect:/fleet/dashboard", redirect);

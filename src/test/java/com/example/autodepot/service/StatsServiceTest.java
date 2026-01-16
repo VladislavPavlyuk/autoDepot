@@ -4,8 +4,8 @@ import com.example.autodepot.entity.Car;
 import com.example.autodepot.entity.Driver;
 import com.example.autodepot.entity.Order;
 import com.example.autodepot.entity.Trip;
-import com.example.autodepot.repository.DriverRepository;
-import com.example.autodepot.repository.TripRepository;
+import com.example.autodepot.service.data.DriverService;
+import com.example.autodepot.service.data.TripDataService;
 import com.example.autodepot.service.stats.CargoByDestinationStatsAggregator;
 import com.example.autodepot.service.stats.DriverEarningsStatsAggregator;
 import com.example.autodepot.service.stats.DriverPerformanceStatsAggregator;
@@ -30,10 +30,10 @@ import static org.mockito.Mockito.*;
 class StatsServiceTest {
 
     @Mock
-    private TripRepository tripRepo;
+    private TripDataService tripDataService;
 
     @Mock
-    private DriverRepository driverRepository;
+    private DriverService driverService;
 
     private StatsService statsService;
 
@@ -66,10 +66,10 @@ class StatsServiceTest {
         completedTrip2.setPayment(300.0);
 
         List<StatsAggregator> aggregators = Arrays.asList(
-            new DriverPerformanceStatsAggregator(tripRepo),
-            new CargoByDestinationStatsAggregator(tripRepo),
-            new DriverEarningsStatsAggregator(driverRepository),
-            new MostProfitableDriverStatsAggregator(driverRepository)
+            new DriverPerformanceStatsAggregator(tripDataService),
+            new CargoByDestinationStatsAggregator(tripDataService),
+            new DriverEarningsStatsAggregator(driverService),
+            new MostProfitableDriverStatsAggregator(driverService)
         );
         statsService = new StatsService(new StatsKeyRegistry(aggregators));
     }
@@ -79,7 +79,7 @@ class StatsServiceTest {
         // Arrange
         Object[] stat1 = new Object[]{"John Smith", 5L, 5000.0};
         Object[] stat2 = new Object[]{"Michael Johnson", 3L, 6000.0};
-        when(tripRepo.findStatsByDriver()).thenReturn(Arrays.asList(stat1, stat2));
+        when(tripDataService.findStatsByDriver()).thenReturn(Arrays.asList(stat1, stat2));
 
         // Act
         Map<String, Object> performance = statsService.getDriverPerformance();
@@ -99,7 +99,7 @@ class StatsServiceTest {
     @Test
     void testGetCargoByDestination() {
         // Arrange
-        when(tripRepo.findAll()).thenReturn(Arrays.asList(completedTrip1, completedTrip2));
+        when(tripDataService.findAll()).thenReturn(Arrays.asList(completedTrip1, completedTrip2));
 
         // Act
         Map<String, Long> cargoByDestination = statsService.getCargoByDestination();
@@ -114,7 +114,7 @@ class StatsServiceTest {
     @Test
     void testGetDriverEarnings() {
         // Arrange
-        when(driverRepository.findAll()).thenReturn(Arrays.asList(driver1, driver2));
+        when(driverService.findAll()).thenReturn(Arrays.asList(driver1, driver2));
 
         // Act
         Map<String, Double> earnings = statsService.getDriverEarnings();
@@ -129,7 +129,7 @@ class StatsServiceTest {
     @Test
     void testGetMostProfitable() {
         // Arrange
-        when(driverRepository.findAll()).thenReturn(Arrays.asList(driver1, driver2));
+        when(driverService.findAll()).thenReturn(Arrays.asList(driver1, driver2));
 
         // Act
         String mostProfitable = statsService.getMostProfitable();
@@ -143,7 +143,7 @@ class StatsServiceTest {
     @Test
     void testGetMostProfitable_NoData() {
         // Arrange
-        when(driverRepository.findAll()).thenReturn(List.of());
+        when(driverService.findAll()).thenReturn(List.of());
 
         // Act
         String mostProfitable = statsService.getMostProfitable();
@@ -158,9 +158,9 @@ class StatsServiceTest {
         Object[] stat = new Object[]{"John Smith", 5L, 5000.0};
         List<Object[]> statsList = new ArrayList<>();
         statsList.add(stat);
-        when(tripRepo.findStatsByDriver()).thenReturn(statsList);
-        when(tripRepo.findAll()).thenReturn(Arrays.asList(completedTrip1));
-        when(driverRepository.findAll()).thenReturn(Arrays.asList(driver1));
+        when(tripDataService.findStatsByDriver()).thenReturn(statsList);
+        when(tripDataService.findAll()).thenReturn(Arrays.asList(completedTrip1));
+        when(driverService.findAll()).thenReturn(Arrays.asList(driver1));
 
         // Act
         Map<String, Object> allStats = statsService.getAllStats();

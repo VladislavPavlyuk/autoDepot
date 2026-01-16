@@ -1,7 +1,7 @@
 package com.example.autodepot.service.stats;
 
 import com.example.autodepot.entity.Trip;
-import com.example.autodepot.repository.TripRepository;
+import com.example.autodepot.service.data.TripDataService;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -11,10 +11,10 @@ import java.util.stream.Collectors;
 
 @Component
 public class CargoByDestinationStatsAggregator implements StatsAggregator {
-    private final TripRepository tripRepo;
+    private final TripDataService tripDataService;
 
-    public CargoByDestinationStatsAggregator(TripRepository tripRepo) {
-        this.tripRepo = tripRepo;
+    public CargoByDestinationStatsAggregator(TripDataService tripDataService) {
+        this.tripDataService = tripDataService;
     }
 
     @Override
@@ -24,7 +24,7 @@ public class CargoByDestinationStatsAggregator implements StatsAggregator {
 
     @Override
     public Object aggregate() {
-        List<Trip> completedTrips = tripRepo.findAll().stream()
+        List<Trip> completedTrips = tripDataService.findAll().stream()
             .filter(t -> t.getStatus() == Trip.TripStatus.COMPLETED)
             .collect(Collectors.toList());
 

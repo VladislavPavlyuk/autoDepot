@@ -44,3 +44,15 @@
 [2026-01-14 18:21:43] TRIP_STARTED - Trip ID: null, Driver: Senior Driver, Car ID: 1, Order: HAZARDOUS -> Los Angeles, Weight: 1000.00 kg, Status: IN_PROGRESS
 [2026-01-14 18:21:44] BREAKDOWN - Trip ID: 1, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: BROKEN
 [2026-01-14 18:21:44] TRIP_STARTED - Trip ID: null, Driver: John Smith, Car ID: 1, Order: STANDARD -> New York, Weight: 1000.00 kg, Status: IN_PROGRESS
+[2026-01-16 09:35:38] TRIP_STARTED - Trip ID: 1, Driver: David Williams, Car ID: 4, Order: STANDARD -> Philadelphia, Weight: 1227.25 kg, Status: IN_PROGRESS
+[2026-01-16 09:35:41] TRIP_COMPLETED - Trip ID: 1, Driver: David Williams, Car ID: 4, Order: STANDARD -> Philadelphia, Weight: 1227.25 kg, Status: COMPLETED
+  Payment: 122725.44, Car Status: OK
+[2026-01-16 09:35:46] TRIP_STARTED - Trip ID: 2, Driver: David Williams, Car ID: 3, Order: OVERSIZED -> New York, Weight: 4483.64 kg, Status: IN_PROGRESS
+[2026-01-16 09:36:05] BREAKDOWN - Trip ID: 2, Driver: David Williams, Car ID: 3, Order: OVERSIZED -> New York, Weight: 4483.64 kg, Status: BROKEN
+[2026-01-16 09:36:16] REPAIR_REQUESTED - Trip ID: 2, Driver: David Williams, Car ID: 3, Order: OVERSIZED -> New York, Weight: 4483.64 kg, Status: REPAIR_REQUESTED
+[2026-01-16 12:37:57] TRIP_STARTED - Trip ID: 1, Driver: David Williams, Car ID: 2, Order: HAZARDOUS -> Phoenix, Weight: 2179.71 kg, Status: IN_PROGRESS
+[2026-01-16 12:38:00] TRIP_STARTED - Trip ID: 2, Driver: John Smith, Car ID: 1, Order: FRAGILE -> Houston, Weight: 1634.21 kg, Status: IN_PROGRESS
+[2026-01-16 12:38:03] TRIP_COMPLETED - Trip ID: 1, Driver: David Williams, Car ID: 2, Order: HAZARDOUS -> Phoenix, Weight: 2179.71 kg, Status: COMPLETED
+  Payment: 435942.28, Car Status: OK
+[2026-01-16 12:38:04] TRIP_COMPLETED - Trip ID: 2, Driver: John Smith, Car ID: 1, Order: FRAGILE -> Houston, Weight: 1634.21 kg, Status: COMPLETED
+  Payment: 245132.08, Car Status: OK

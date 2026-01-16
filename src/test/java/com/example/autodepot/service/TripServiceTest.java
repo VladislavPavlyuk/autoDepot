@@ -8,6 +8,11 @@ import com.example.autodepot.repository.CarRepository;
 import com.example.autodepot.repository.DriverRepository;
 import com.example.autodepot.repository.OrderRepository;
 import com.example.autodepot.repository.TripRepository;
+import com.example.autodepot.service.logging.TripEventLogger;
+import com.example.autodepot.service.payment.PaymentCalculator;
+import com.example.autodepot.service.selection.CarSelectionPolicy;
+import com.example.autodepot.service.selection.DriverSelectionPolicy;
+import com.example.autodepot.service.simulation.BreakdownSimulator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +25,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -37,6 +44,21 @@ class TripServiceTest {
 
     @Mock
     private OrderRepository orderRepository;
+
+    @Mock
+    private DriverSelectionPolicy driverSelectionPolicy;
+
+    @Mock
+    private CarSelectionPolicy carSelectionPolicy;
+
+    @Mock
+    private PaymentCalculator paymentCalculator;
+
+    @Mock
+    private TripEventLogger tripEventLogger;
+
+    @Mock
+    private BreakdownSimulator breakdownSimulator;
 
     @InjectMocks
     private TripService tripService;
@@ -65,6 +87,10 @@ class TripServiceTest {
         when(orderRepository.findById(1L)).thenReturn(Optional.of(testOrder));
         when(driverRepo.findByIsAvailableTrue()).thenReturn(List.of(testDriver));
         when(carRepo.findByIsBrokenFalse()).thenReturn(List.of(testCar));
+        when(driverSelectionPolicy.selectDriver(eq(testOrder), anyList()))
+            .thenReturn(Optional.of(testDriver));
+        when(carSelectionPolicy.selectCar(eq(testOrder), anyList()))
+            .thenReturn(Optional.of(testCar));
         when(tripRepo.save(any(Trip.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(driverRepo.save(any(Driver.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -95,6 +121,8 @@ class TripServiceTest {
         // Arrange
         when(orderRepository.findById(1L)).thenReturn(Optional.of(testOrder));
         when(driverRepo.findByIsAvailableTrue()).thenReturn(new ArrayList<>());
+        when(driverSelectionPolicy.selectDriver(eq(testOrder), anyList()))
+            .thenReturn(Optional.empty());
 
         // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class, 
@@ -119,6 +147,10 @@ class TripServiceTest {
         when(orderRepository.findById(2L)).thenReturn(Optional.of(hazardousOrder));
         when(driverRepo.findByIsAvailableTrue()).thenReturn(List.of(juniorDriver, seniorDriver));
         when(carRepo.findByIsBrokenFalse()).thenReturn(List.of(testCar));
+        when(driverSelectionPolicy.selectDriver(eq(hazardousOrder), anyList()))
+            .thenReturn(Optional.of(seniorDriver));
+        when(carSelectionPolicy.selectCar(eq(hazardousOrder), anyList()))
+            .thenReturn(Optional.of(testCar));
         when(tripRepo.save(any(Trip.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(driverRepo.save(any(Driver.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -138,6 +170,7 @@ class TripServiceTest {
         trip.setStatus(Trip.TripStatus.IN_PROGRESS);
 
         when(tripRepo.findById(1L)).thenReturn(Optional.of(trip));
+        when(paymentCalculator.calculatePayment(eq(testOrder))).thenReturn(123.0);
         when(tripRepo.save(any(Trip.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(driverRepo.save(any(Driver.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(carRepo.save(any(Car.class))).thenAnswer(invocation -> invocation.getArgument(0));

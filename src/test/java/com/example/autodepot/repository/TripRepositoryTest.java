@@ -5,6 +5,7 @@ import com.example.autodepot.entity.Car;
 import com.example.autodepot.entity.Driver;
 import com.example.autodepot.entity.Order;
 import com.example.autodepot.entity.Trip;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,6 +28,14 @@ class TripRepositoryTest extends AbstractPostgresTest {
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @BeforeEach
+    void setUp() {
+        tripRepository.deleteAll();
+        orderRepository.deleteAll();
+        driverRepository.deleteAll();
+        carRepository.deleteAll();
+    }
 
     @Test
     void saveAndFindTrip_WhenTripSaved_ReturnsMatchingTrip() {
@@ -128,11 +137,6 @@ class TripRepositoryTest extends AbstractPostgresTest {
 
     @Test
     void findStatsByDriver_WhenNoTrips_ReturnsEmptyStats() {
-        tripRepository.deleteAll();
-        orderRepository.deleteAll();
-        driverRepository.deleteAll();
-        carRepository.deleteAll();
-
         List<Object[]> stats = tripRepository.findStatsByDriver();
         int actualResult = stats == null ? 0 : stats.size();
         int expectedResult = 0;

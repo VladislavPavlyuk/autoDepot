@@ -44,6 +44,6 @@ echo Building and starting application...
 echo.
 
 REM Run the application
-call mvnw.cmd spring-boot:run -Dspring-boot.run.arguments=--spring.pid.file=app.pid
+call mvnw.cmd spring-boot:run "-Dspring-boot.run.arguments=--spring.pid.file=app.pid"
 
 pause

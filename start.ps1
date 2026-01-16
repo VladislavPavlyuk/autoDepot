@@ -33,7 +33,7 @@ if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
 }
 
 Write-Host "Starting Postgres (Docker Compose)..." -ForegroundColor Green
-docker compose up -d | Out-Null
+& docker compose up -d *> $null
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERROR: Failed to start Postgres via Docker Compose" -ForegroundColor Red
     Read-Host "Press Enter to exit"
@@ -50,6 +50,6 @@ Write-Host "Building and starting application..." -ForegroundColor Green
 Write-Host ""
 
 # Run the application
-& .\mvnw.cmd spring-boot:run -Dspring-boot.run.arguments=--spring.pid.file=app.pid
+& .\mvnw.cmd spring-boot:run "-Dspring-boot.run.arguments=--spring.pid.file=app.pid"
 
 Read-Host "`nPress Enter to exit"

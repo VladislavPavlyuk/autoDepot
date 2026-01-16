@@ -128,6 +128,11 @@ class TripRepositoryTest extends AbstractPostgresTest {
 
     @Test
     void findStatsByDriver_WhenNoTrips_ReturnsEmptyStats() {
+        tripRepository.deleteAll();
+        orderRepository.deleteAll();
+        driverRepository.deleteAll();
+        carRepository.deleteAll();
+
         List<Object[]> stats = tripRepository.findStatsByDriver();
         int actualResult = stats == null ? 0 : stats.size();
         int expectedResult = 0;

@@ -192,7 +192,6 @@ class TripServiceTest {
         when(tripDataService.save(any(Trip.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(driverService.save(any(Driver.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Act
         TripAssignDTO assignDTO = new TripAssignDTO();
         assignDTO.setOrderId(2L);
         TripAssignCommand assignCommand = new TripAssignCommand();
@@ -220,7 +219,6 @@ class TripServiceTest {
         when(driverService.save(any(Driver.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(carService.save(any(Car.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Act
         TripCompleteDTO completeDTO = new TripCompleteDTO();
         completeDTO.setTripId(1L);
         completeDTO.setCarStatus("OK");
@@ -254,7 +252,6 @@ class TripServiceTest {
         when(tripDataService.save(any(Trip.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(carService.save(any(Car.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Act
         TripBreakdownDTO breakdownDTO = new TripBreakdownDTO();
         breakdownDTO.setTripId(1L);
         TripBreakdownCommand breakdownCommand = new TripBreakdownCommand();
@@ -283,7 +280,6 @@ class TripServiceTest {
         when(tripDataService.findById(1L)).thenReturn(Optional.of(trip));
         when(tripDataService.save(any(Trip.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Act
         TripRepairDTO repairDTO = new TripRepairDTO();
         repairDTO.setTripId(1L);
         TripRepairCommand repairCommand = new TripRepairCommand();

@@ -186,6 +186,12 @@
     </div>
 
     <div class="container">
+        <div class="section" th:if="${errorMessage}">
+            <div style="padding: 12px 16px; border: 1px solid #dc3545; background: #f8d7da; color: #842029; border-radius: 6px;">
+                <strong>Error:</strong> <span th:text="${errorMessage}"></span>
+            </div>
+        </div>
+
         <div class="section">
             <h2>📊 Statistics</h2>
             <div class="stats-grid">

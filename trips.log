@@ -65,3 +65,18 @@
 [2026-01-16 12:53:38] REPAIR_REQUESTED - Trip ID: 2, Driver: John Smith, Car ID: 4, Order: STANDARD -> Chicago, Weight: 746.94 kg, Status: REPAIR_REQUESTED
 [2026-01-16 12:53:40] TRIP_COMPLETED - Trip ID: 3, Driver: Michael Johnson, Car ID: 2, Order: OVERSIZED -> New York, Weight: 3075.29 kg, Status: COMPLETED
   Payment: 399787.82, Car Status: OK
+[2026-01-16 13:18:25] TRIP_STARTED - Trip ID: 1, Driver: David Williams, Car ID: 4, Order: FRAGILE -> Philadelphia, Weight: 1013.76 kg, Status: IN_PROGRESS
+[2026-01-16 13:18:27] TRIP_STARTED - Trip ID: 2, Driver: John Smith, Car ID: 2, Order: HAZARDOUS -> Philadelphia, Weight: 3106.39 kg, Status: IN_PROGRESS
+[2026-01-16 13:21:44] TRIP_STARTED - Trip ID: 3, Driver: Michael Johnson, Car ID: 2, Order: OVERSIZED -> Chicago, Weight: 2753.50 kg, Status: IN_PROGRESS
+[2026-01-16 13:21:52] TRIP_STARTED - Trip ID: 4, Driver: James Davis, Car ID: 2, Order: STANDARD -> Los Angeles, Weight: 2451.21 kg, Status: IN_PROGRESS
+[2026-01-16 13:22:17] TRIP_COMPLETED - Trip ID: 4, Driver: James Davis, Car ID: 2, Order: STANDARD -> Los Angeles, Weight: 2451.21 kg, Status: COMPLETED
+  Payment: 245120.52, Car Status: OK
+[2026-01-16 13:22:19] TRIP_COMPLETED - Trip ID: 1, Driver: David Williams, Car ID: 4, Order: FRAGILE -> Philadelphia, Weight: 1013.76 kg, Status: COMPLETED
+  Payment: 152063.94, Car Status: OK
+[2026-01-16 13:22:22] TRIP_STARTED - Trip ID: 5, Driver: David Williams, Car ID: 1, Order: HAZARDOUS -> Chicago, Weight: 1909.75 kg, Status: IN_PROGRESS
+[2026-01-16 13:22:29] TRIP_COMPLETED - Trip ID: 5, Driver: David Williams, Car ID: 1, Order: HAZARDOUS -> Chicago, Weight: 1909.75 kg, Status: COMPLETED
+  Payment: 381950.37, Car Status: OK
+[2026-01-16 13:22:33] BREAKDOWN - Trip ID: 2, Driver: John Smith, Car ID: 2, Order: HAZARDOUS -> Philadelphia, Weight: 3106.39 kg, Status: BROKEN
+[2026-01-16 13:22:36] REPAIR_REQUESTED - Trip ID: 2, Driver: John Smith, Car ID: 2, Order: HAZARDOUS -> Philadelphia, Weight: 3106.39 kg, Status: REPAIR_REQUESTED
+[2026-01-16 13:22:38] TRIP_COMPLETED - Trip ID: 3, Driver: Michael Johnson, Car ID: 2, Order: OVERSIZED -> Chicago, Weight: 2753.50 kg, Status: COMPLETED
+  Payment: 357955.46, Car Status: OK

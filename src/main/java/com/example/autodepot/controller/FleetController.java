@@ -11,6 +11,7 @@ import com.example.autodepot.service.TripService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Map;
@@ -71,27 +72,44 @@ public class FleetController {
     }
 
     @PostMapping("/trips/assign")
-    public String assignTrip(@RequestParam Long orderId) {
-        tripService.createTrip(orderId);
+    public String assignTrip(@RequestParam Long orderId, RedirectAttributes redirectAttributes) {
+        try {
+            tripService.createTrip(orderId);
+        } catch (RuntimeException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
         return "redirect:/fleet/dashboard";
     }
 
     @PostMapping("/trips/{tripId}/complete")
     public String completeTrip(@PathVariable Long tripId, 
-                              @RequestParam String carStatus) {
-        tripService.completeTrip(tripId, carStatus);
+                              @RequestParam String carStatus,
+                              RedirectAttributes redirectAttributes) {
+        try {
+            tripService.completeTrip(tripId, carStatus);
+        } catch (RuntimeException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
         return "redirect:/fleet/dashboard";
     }
 
     @PostMapping("/trips/{tripId}/breakdown")
-    public String reportBreakdown(@PathVariable Long tripId) {
-        tripService.processBreakdown(tripId);
+    public String reportBreakdown(@PathVariable Long tripId, RedirectAttributes redirectAttributes) {
+        try {
+            tripService.processBreakdown(tripId);
+        } catch (RuntimeException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
         return "redirect:/fleet/dashboard";
     }
 
     @PostMapping("/trips/{tripId}/repair")
-    public String requestRepair(@PathVariable Long tripId) {
-        tripService.requestRepair(tripId);
+    public String requestRepair(@PathVariable Long tripId, RedirectAttributes redirectAttributes) {
+        try {
+            tripService.requestRepair(tripId);
+        } catch (RuntimeException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
         return "redirect:/fleet/dashboard";
     }
 

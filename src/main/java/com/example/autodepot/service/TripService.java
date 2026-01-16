@@ -4,6 +4,15 @@ import com.example.autodepot.entity.Car;
 import com.example.autodepot.entity.Driver;
 import com.example.autodepot.entity.Order;
 import com.example.autodepot.entity.Trip;
+import com.example.autodepot.dto.TripAssignDTO;
+import com.example.autodepot.dto.TripBreakdownDTO;
+import com.example.autodepot.dto.TripCompleteDTO;
+import com.example.autodepot.dto.TripRepairDTO;
+import com.example.autodepot.mapper.TripCommandMapper;
+import com.example.autodepot.service.command.TripAssignCommand;
+import com.example.autodepot.service.command.TripBreakdownCommand;
+import com.example.autodepot.service.command.TripCompleteCommand;
+import com.example.autodepot.service.command.TripRepairCommand;
 import com.example.autodepot.service.data.CarService;
 import com.example.autodepot.service.data.DriverService;
 import com.example.autodepot.service.data.OrderService;
@@ -31,6 +40,7 @@ public class TripService {
     private final PaymentCalculator paymentCalculator;
     private final TripEventLogger tripEventLogger;
     private final BreakdownSimulator breakdownSimulator;
+    private final TripCommandMapper tripCommandMapper;
 
     public TripService(DriverService driverService, CarService carService,
                       TripDataService tripDataService, OrderService orderService,
@@ -38,7 +48,8 @@ public class TripService {
                       CarSelectionPolicy carSelectionPolicy,
                       PaymentCalculator paymentCalculator,
                       TripEventLogger tripEventLogger,
-                      BreakdownSimulator breakdownSimulator) {
+                      BreakdownSimulator breakdownSimulator,
+                      TripCommandMapper tripCommandMapper) {
         this.driverService = driverService;
         this.carService = carService;
         this.tripDataService = tripDataService;
@@ -48,16 +59,18 @@ public class TripService {
         this.paymentCalculator = paymentCalculator;
         this.tripEventLogger = tripEventLogger;
         this.breakdownSimulator = breakdownSimulator;
+        this.tripCommandMapper = tripCommandMapper;
     }
 
     @Transactional
-    public void createTrip(Long orderId) {
-        Order order = orderService.findById(orderId)
-            .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+    public void createTrip(TripAssignDTO assignDTO) {
+        TripAssignCommand command = tripCommandMapper.toCommand(assignDTO);
+        Order order = orderService.findById(command.getOrderId())
+            .orElseThrow(() -> new RuntimeException("Order not found: " + command.getOrderId()));
 
         List<Driver> availableDrivers = driverService.findAvailableDrivers();
         Driver driver = driverSelectionPolicy.selectDriver(order, availableDrivers)
-            .orElseThrow(() -> new RuntimeException("No available drivers for order: " + orderId));
+            .orElseThrow(() -> new RuntimeException("No available drivers for order: " + command.getOrderId()));
 
         List<Car> availableCars = carService.findAvailableCars();
         Car car = carSelectionPolicy.selectCar(order, availableCars)
@@ -74,9 +87,10 @@ public class TripService {
     }
 
     @Transactional
-    public void processBreakdown(Long tripId) {
-        Trip trip = tripDataService.findById(tripId)
-            .orElseThrow(() -> new RuntimeException("Trip not found: " + tripId));
+    public void processBreakdown(TripBreakdownDTO breakdownDTO) {
+        TripBreakdownCommand command = tripCommandMapper.toCommand(breakdownDTO);
+        Trip trip = tripDataService.findById(command.getTripId())
+            .orElseThrow(() -> new RuntimeException("Trip not found: " + command.getTripId()));
 
         Car car = trip.getCar();
         car.setBroken(true);
@@ -89,9 +103,10 @@ public class TripService {
     }
 
     @Transactional
-    public void requestRepair(Long tripId) {
-        Trip trip = tripDataService.findById(tripId)
-            .orElseThrow(() -> new RuntimeException("Trip not found: " + tripId));
+    public void requestRepair(TripRepairDTO repairDTO) {
+        TripRepairCommand command = tripCommandMapper.toCommand(repairDTO);
+        Trip trip = tripDataService.findById(command.getTripId())
+            .orElseThrow(() -> new RuntimeException("Trip not found: " + command.getTripId()));
 
         if (trip.getStatus() != Trip.TripStatus.BROKEN) {
             throw new RuntimeException("Trip is not broken");
@@ -104,9 +119,10 @@ public class TripService {
     }
 
     @Transactional
-    public void completeTrip(Long tripId, String carStatus) {
-        Trip trip = tripDataService.findById(tripId)
-            .orElseThrow(() -> new RuntimeException("Trip not found: " + tripId));
+    public void completeTrip(TripCompleteDTO completeDTO) {
+        TripCompleteCommand command = tripCommandMapper.toCommand(completeDTO);
+        Trip trip = tripDataService.findById(command.getTripId())
+            .orElseThrow(() -> new RuntimeException("Trip not found: " + command.getTripId()));
 
         if (trip.getStatus() != Trip.TripStatus.IN_PROGRESS) {
             throw new RuntimeException("Trip is not in progress");
@@ -117,7 +133,7 @@ public class TripService {
         trip.setStatus(Trip.TripStatus.COMPLETED);
         trip.setEndTime(LocalDateTime.now());
         trip.setPayment(payment);
-        trip.setCarStatusAfterTrip(carStatus);
+        trip.setCarStatusAfterTrip(command.getCarStatus());
         tripDataService.save(trip);
 
         Driver driver = trip.getDriver();
@@ -126,7 +142,7 @@ public class TripService {
         driverService.save(driver);
 
         Car car = trip.getCar();
-        if ("BROKEN".equalsIgnoreCase(carStatus)) {
+        if ("BROKEN".equalsIgnoreCase(command.getCarStatus())) {
             car.setBroken(true);
         }
         carService.save(car);
@@ -141,6 +157,7 @@ public class TripService {
             .collect(Collectors.toList());
 
         breakdownSimulator.chooseTripToBreak(activeTrips)
-            .ifPresent(trip -> processBreakdown(trip.getId()));
+            .map(tripCommandMapper::toBreakdownDto)
+            .ifPresent(this::processBreakdown);
     }
 }

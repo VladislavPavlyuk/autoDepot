@@ -1,9 +1,18 @@
 package com.example.autodepot.service;
 
+import com.example.autodepot.dto.TripAssignDTO;
+import com.example.autodepot.dto.TripBreakdownDTO;
+import com.example.autodepot.dto.TripCompleteDTO;
+import com.example.autodepot.dto.TripRepairDTO;
 import com.example.autodepot.entity.Car;
 import com.example.autodepot.entity.Driver;
 import com.example.autodepot.entity.Order;
 import com.example.autodepot.entity.Trip;
+import com.example.autodepot.mapper.TripCommandMapper;
+import com.example.autodepot.service.command.TripAssignCommand;
+import com.example.autodepot.service.command.TripBreakdownCommand;
+import com.example.autodepot.service.command.TripCompleteCommand;
+import com.example.autodepot.service.command.TripRepairCommand;
 import com.example.autodepot.service.data.CarService;
 import com.example.autodepot.service.data.DriverService;
 import com.example.autodepot.service.data.OrderService;
@@ -60,6 +69,9 @@ class TripServiceTest {
     @Mock
     private BreakdownSimulator breakdownSimulator;
 
+    @Mock
+    private TripCommandMapper tripCommandMapper;
+
     @InjectMocks
     private TripService tripService;
 
@@ -95,7 +107,12 @@ class TripServiceTest {
         when(driverService.save(any(Driver.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
-        assertDoesNotThrow(() -> tripService.createTrip(1L));
+        TripAssignDTO assignDTO = new TripAssignDTO();
+        assignDTO.setOrderId(1L);
+        TripAssignCommand assignCommand = new TripAssignCommand();
+        assignCommand.setOrderId(1L);
+        when(tripCommandMapper.toCommand(assignDTO)).thenReturn(assignCommand);
+        assertDoesNotThrow(() -> tripService.createTrip(assignDTO));
 
         // Assert
         verify(orderService, times(1)).findById(1L);
@@ -111,8 +128,13 @@ class TripServiceTest {
         when(orderService.findById(1L)).thenReturn(Optional.empty());
 
         // Act & Assert
+        TripAssignDTO assignDTO = new TripAssignDTO();
+        assignDTO.setOrderId(1L);
+        TripAssignCommand assignCommand = new TripAssignCommand();
+        assignCommand.setOrderId(1L);
+        when(tripCommandMapper.toCommand(assignDTO)).thenReturn(assignCommand);
         RuntimeException exception = assertThrows(RuntimeException.class, 
-            () -> tripService.createTrip(1L));
+            () -> tripService.createTrip(assignDTO));
         assertEquals("Order not found: 1", exception.getMessage());
     }
 
@@ -125,8 +147,13 @@ class TripServiceTest {
             .thenReturn(Optional.empty());
 
         // Act & Assert
+        TripAssignDTO assignDTO = new TripAssignDTO();
+        assignDTO.setOrderId(1L);
+        TripAssignCommand assignCommand = new TripAssignCommand();
+        assignCommand.setOrderId(1L);
+        when(tripCommandMapper.toCommand(assignDTO)).thenReturn(assignCommand);
         RuntimeException exception = assertThrows(RuntimeException.class, 
-            () -> tripService.createTrip(1L));
+            () -> tripService.createTrip(assignDTO));
         assertTrue(exception.getMessage().contains("No available drivers"));
     }
 
@@ -155,7 +182,12 @@ class TripServiceTest {
         when(driverService.save(any(Driver.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
-        tripService.createTrip(2L);
+        TripAssignDTO assignDTO = new TripAssignDTO();
+        assignDTO.setOrderId(2L);
+        TripAssignCommand assignCommand = new TripAssignCommand();
+        assignCommand.setOrderId(2L);
+        when(tripCommandMapper.toCommand(assignDTO)).thenReturn(assignCommand);
+        tripService.createTrip(assignDTO);
 
         // Assert - Senior driver should be selected (experience >= 10)
         verify(tripDataService, times(1)).save(argThat(trip -> 
@@ -176,7 +208,14 @@ class TripServiceTest {
         when(carService.save(any(Car.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
-        tripService.completeTrip(1L, "OK");
+        TripCompleteDTO completeDTO = new TripCompleteDTO();
+        completeDTO.setTripId(1L);
+        completeDTO.setCarStatus("OK");
+        TripCompleteCommand completeCommand = new TripCompleteCommand();
+        completeCommand.setTripId(1L);
+        completeCommand.setCarStatus("OK");
+        when(tripCommandMapper.toCommand(completeDTO)).thenReturn(completeCommand);
+        tripService.completeTrip(completeDTO);
 
         // Assert
         verify(tripDataService, times(1)).findById(1L);
@@ -200,7 +239,12 @@ class TripServiceTest {
         when(carService.save(any(Car.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
-        tripService.processBreakdown(1L);
+        TripBreakdownDTO breakdownDTO = new TripBreakdownDTO();
+        breakdownDTO.setTripId(1L);
+        TripBreakdownCommand breakdownCommand = new TripBreakdownCommand();
+        breakdownCommand.setTripId(1L);
+        when(tripCommandMapper.toCommand(breakdownDTO)).thenReturn(breakdownCommand);
+        tripService.processBreakdown(breakdownDTO);
 
         // Assert
         verify(tripDataService, times(1)).save(argThat(t -> 
@@ -219,7 +263,12 @@ class TripServiceTest {
         when(tripDataService.save(any(Trip.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
-        tripService.requestRepair(1L);
+        TripRepairDTO repairDTO = new TripRepairDTO();
+        repairDTO.setTripId(1L);
+        TripRepairCommand repairCommand = new TripRepairCommand();
+        repairCommand.setTripId(1L);
+        when(tripCommandMapper.toCommand(repairDTO)).thenReturn(repairCommand);
+        tripService.requestRepair(repairDTO);
 
         // Assert
         verify(tripDataService, times(1)).save(argThat(t -> 

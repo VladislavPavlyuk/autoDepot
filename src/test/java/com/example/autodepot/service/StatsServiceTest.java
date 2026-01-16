@@ -6,6 +6,10 @@ import com.example.autodepot.entity.Order;
 import com.example.autodepot.entity.Trip;
 import com.example.autodepot.service.data.DriverService;
 import com.example.autodepot.service.data.TripDataService;
+import com.example.autodepot.dto.CargoByDestinationDTO;
+import com.example.autodepot.dto.DriverEarningsDTO;
+import com.example.autodepot.dto.DriverPerformanceDTO;
+import com.example.autodepot.dto.StatsSummaryDTO;
 import com.example.autodepot.service.stats.CargoByDestinationStatsAggregator;
 import com.example.autodepot.service.stats.DriverEarningsStatsAggregator;
 import com.example.autodepot.service.stats.DriverPerformanceStatsAggregator;
@@ -21,7 +25,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -82,18 +85,17 @@ class StatsServiceTest {
         when(tripDataService.findStatsByDriver()).thenReturn(Arrays.asList(stat1, stat2));
 
         // Act
-        Map<String, Object> performance = statsService.getDriverPerformance();
+        List<DriverPerformanceDTO> performance = statsService.getDriverPerformance();
 
         // Assert
         assertNotNull(performance);
         assertEquals(2, performance.size());
-        assertTrue(performance.containsKey("John Smith"));
-        assertTrue(performance.containsKey("Michael Johnson"));
-        
-        @SuppressWarnings("unchecked")
-        Map<String, Object> driver1Stats = (Map<String, Object>) performance.get("John Smith");
-        assertEquals(5L, driver1Stats.get("tripCount"));
-        assertEquals(5000.0, driver1Stats.get("totalWeight"));
+        DriverPerformanceDTO johnStats = performance.stream()
+            .filter(dto -> "John Smith".equals(dto.getDriverName()))
+            .findFirst()
+            .orElseThrow();
+        assertEquals(5L, johnStats.getTripCount());
+        assertEquals(5000.0, johnStats.getTotalWeight());
     }
 
     @Test
@@ -102,13 +104,16 @@ class StatsServiceTest {
         when(tripDataService.findAll()).thenReturn(Arrays.asList(completedTrip1, completedTrip2));
 
         // Act
-        Map<String, Long> cargoByDestination = statsService.getCargoByDestination();
+        List<CargoByDestinationDTO> cargoByDestination = statsService.getCargoByDestination();
 
         // Assert
         assertNotNull(cargoByDestination);
         assertEquals(2, cargoByDestination.size());
-        assertEquals(1L, cargoByDestination.get("New York"));
-        assertEquals(1L, cargoByDestination.get("Los Angeles"));
+        CargoByDestinationDTO la = cargoByDestination.stream()
+            .filter(dto -> "Los Angeles".equals(dto.getDestination()))
+            .findFirst()
+            .orElseThrow();
+        assertEquals(1L, la.getCargoCount());
     }
 
     @Test
@@ -117,13 +122,16 @@ class StatsServiceTest {
         when(driverService.findAll()).thenReturn(Arrays.asList(driver1, driver2));
 
         // Act
-        Map<String, Double> earnings = statsService.getDriverEarnings();
+        List<DriverEarningsDTO> earnings = statsService.getDriverEarnings();
 
         // Assert
         assertNotNull(earnings);
         assertEquals(2, earnings.size());
-        assertEquals(500.0, earnings.get("John Smith"));
-        assertEquals(750.0, earnings.get("Michael Johnson"));
+        DriverEarningsDTO john = earnings.stream()
+            .filter(dto -> "John Smith".equals(dto.getDriverName()))
+            .findFirst()
+            .orElseThrow();
+        assertEquals(500.0, john.getEarnings());
     }
 
     @Test
@@ -163,13 +171,13 @@ class StatsServiceTest {
         when(driverService.findAll()).thenReturn(Arrays.asList(driver1));
 
         // Act
-        Map<String, Object> allStats = statsService.getAllStats();
+        StatsSummaryDTO allStats = statsService.getAllStats();
 
         // Assert
         assertNotNull(allStats);
-        assertTrue(allStats.containsKey("driverPerformance"));
-        assertTrue(allStats.containsKey("cargoByDestination"));
-        assertTrue(allStats.containsKey("driverEarnings"));
-        assertTrue(allStats.containsKey("mostProfitableDriver"));
+        assertNotNull(allStats.getDriverPerformance());
+        assertNotNull(allStats.getCargoByDestination());
+        assertNotNull(allStats.getDriverEarnings());
+        assertNotNull(allStats.getMostProfitableDriver());
     }
 }

@@ -1,43 +1,55 @@
 package com.example.autodepot.service;
 
+import com.example.autodepot.dto.CargoByDestinationDTO;
+import com.example.autodepot.dto.DriverEarningsDTO;
+import com.example.autodepot.dto.DriverPerformanceDTO;
+import com.example.autodepot.dto.StatsSummaryDTO;
+import com.example.autodepot.mapper.StatsMapper;
 import com.example.autodepot.service.stats.StatsAggregator;
 import com.example.autodepot.service.stats.StatsKey;
 import com.example.autodepot.service.stats.StatsKeyRegistry;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
 public class StatsService {
     private final StatsKeyRegistry statsKeyRegistry;
+    private final StatsMapper statsMapper;
 
-    public StatsService(StatsKeyRegistry statsKeyRegistry) {
+    public StatsService(StatsKeyRegistry statsKeyRegistry, StatsMapper statsMapper) {
         this.statsKeyRegistry = statsKeyRegistry;
+        this.statsMapper = statsMapper;
     }
 
-    public Map<String, Object> getDriverPerformance() {
-        return getStatMap(StatsKey.DRIVER_PERFORMANCE);
+    public List<DriverPerformanceDTO> getDriverPerformance() {
+        Map<String, Object> performance = getStatMap(StatsKey.DRIVER_PERFORMANCE);
+        Map<String, Double> earnings = getStatMap(StatsKey.DRIVER_EARNINGS);
+        return statsMapper.toDriverPerformanceList(performance, earnings);
     }
 
-    public Map<String, Long> getCargoByDestination() {
-        return getStatMap(StatsKey.CARGO_BY_DESTINATION);
+    public List<CargoByDestinationDTO> getCargoByDestination() {
+        Map<String, Long> cargoByDestination = getStatMap(StatsKey.CARGO_BY_DESTINATION);
+        return statsMapper.toCargoByDestinationList(cargoByDestination);
     }
 
-    public Map<String, Double> getDriverEarnings() {
-        return getStatMap(StatsKey.DRIVER_EARNINGS);
+    public List<DriverEarningsDTO> getDriverEarnings() {
+        Map<String, Double> earnings = getStatMap(StatsKey.DRIVER_EARNINGS);
+        return statsMapper.toDriverEarningsList(earnings);
     }
 
     public String getMostProfitable() {
         return getStatString(StatsKey.MOST_PROFITABLE_DRIVER);
     }
 
-    public Map<String, Object> getAllStats() {
-        Map<String, Object> allStats = new HashMap<>();
-        for (Map.Entry<StatsKey, StatsAggregator> entry : statsKeyRegistry.getAll().entrySet()) {
-            allStats.put(entry.getKey().getResponseKey(), entry.getValue().aggregate());
-        }
-        return allStats;
+    public StatsSummaryDTO getAllStats() {
+        StatsSummaryDTO summary = new StatsSummaryDTO();
+        summary.setMostProfitableDriver(getMostProfitable());
+        summary.setDriverPerformance(getDriverPerformance());
+        summary.setDriverEarnings(getDriverEarnings());
+        summary.setCargoByDestination(getCargoByDestination());
+        return summary;
     }
 
     private String getStatString(StatsKey key) {

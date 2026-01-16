@@ -1,67 +1,63 @@
 package com.example.autodepot.controller;
 
 import com.example.autodepot.dto.OrderDTO;
-import com.example.autodepot.entity.Order;
-import com.example.autodepot.entity.Trip;
+import com.example.autodepot.dto.StatsSummaryDTO;
+import com.example.autodepot.dto.TripAssignDTO;
+import com.example.autodepot.dto.TripBreakdownDTO;
+import com.example.autodepot.dto.TripCompleteDTO;
+import com.example.autodepot.dto.TripRepairDTO;
+import com.example.autodepot.mapper.TripCommandMapper;
+import com.example.autodepot.service.FleetDashboardService;
+import com.example.autodepot.service.OrderApplicationService;
 import com.example.autodepot.service.OrderGenerationService;
 import com.example.autodepot.service.StatsService;
 import com.example.autodepot.service.TripService;
-import com.example.autodepot.service.data.OrderService;
-import com.example.autodepot.service.data.TripDataService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/fleet")
 public class FleetController {
     private final TripService tripService;
     private final StatsService statsService;
-    private final OrderService orderService;
-    private final TripDataService tripDataService;
+    private final FleetDashboardService fleetDashboardService;
+    private final OrderApplicationService orderApplicationService;
     private final OrderGenerationService orderGenerationService;
+    private final TripCommandMapper tripCommandMapper;
 
     public FleetController(TripService tripService, StatsService statsService, 
-                           OrderService orderService, TripDataService tripDataService,
-                           OrderGenerationService orderGenerationService) {
+                           FleetDashboardService fleetDashboardService,
+                           OrderApplicationService orderApplicationService,
+                           OrderGenerationService orderGenerationService,
+                           TripCommandMapper tripCommandMapper) {
         this.tripService = tripService;
         this.statsService = statsService;
-        this.orderService = orderService;
-        this.tripDataService = tripDataService;
+        this.fleetDashboardService = fleetDashboardService;
+        this.orderApplicationService = orderApplicationService;
         this.orderGenerationService = orderGenerationService;
+        this.tripCommandMapper = tripCommandMapper;
     }
 
     @GetMapping("/dashboard")
     public String getDashboard(Model model) {
-        Map<String, Object> allStats = statsService.getAllStats();
-        model.addAllAttributes(allStats);
+        StatsSummaryDTO allStats = statsService.getAllStats();
+        model.addAttribute("mostProfitableDriver", allStats.getMostProfitableDriver());
+        model.addAttribute("driverPerformance", allStats.getDriverPerformance());
+        model.addAttribute("driverEarnings", allStats.getDriverEarnings());
+        model.addAttribute("cargoByDestination", allStats.getCargoByDestination());
         
-        List<Order> allOrders = orderService.findAll();
-        List<Order> pendingOrders = allOrders.stream()
-            .filter(o -> !tripDataService.existsByOrderId(o.getId()))
-            .toList();
-        model.addAttribute("pendingOrders", pendingOrders);
-        
-        List<Trip> activeTrips = tripDataService.findAll().stream()
-            .filter(t -> t.getStatus() == Trip.TripStatus.IN_PROGRESS || 
-                        t.getStatus() == Trip.TripStatus.BROKEN ||
-                        t.getStatus() == Trip.TripStatus.REPAIR_REQUESTED)
-            .toList();
-        model.addAttribute("activeTrips", activeTrips);
+        model.addAttribute("pendingOrders", fleetDashboardService.getPendingOrders());
+        model.addAttribute("activeTrips", fleetDashboardService.getActiveTrips());
         
         return "dashboard";
     }
 
     @PostMapping("/orders")
     public String createOrder(@ModelAttribute OrderDTO orderDTO) {
-        Order order = new Order(orderDTO.getDestination(), 
-                               orderDTO.getCargoType(), 
-                               orderDTO.getWeight());
-        orderService.save(order);
+        orderApplicationService.createOrder(orderDTO);
         return "redirect:/fleet/dashboard";
     }
 
@@ -72,9 +68,10 @@ public class FleetController {
     }
 
     @PostMapping("/trips/assign")
-    public String assignTrip(@RequestParam Long orderId, RedirectAttributes redirectAttributes) {
+    public String assignTrip(@ModelAttribute TripAssignDTO tripAssignDTO,
+                             RedirectAttributes redirectAttributes) {
         try {
-            tripService.createTrip(orderId);
+            tripService.createTrip(tripAssignDTO);
         } catch (RuntimeException ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
@@ -83,10 +80,11 @@ public class FleetController {
 
     @PostMapping("/trips/{tripId}/complete")
     public String completeTrip(@PathVariable Long tripId, 
-                              @RequestParam String carStatus,
+                              @ModelAttribute TripCompleteDTO tripCompleteDTO,
                               RedirectAttributes redirectAttributes) {
+        tripCompleteDTO.setTripId(tripId);
         try {
-            tripService.completeTrip(tripId, carStatus);
+            tripService.completeTrip(tripCompleteDTO);
         } catch (RuntimeException ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
@@ -95,8 +93,9 @@ public class FleetController {
 
     @PostMapping("/trips/{tripId}/breakdown")
     public String reportBreakdown(@PathVariable Long tripId, RedirectAttributes redirectAttributes) {
+        TripBreakdownDTO breakdownDTO = tripCommandMapper.toBreakdownDto(tripId);
         try {
-            tripService.processBreakdown(tripId);
+            tripService.processBreakdown(breakdownDTO);
         } catch (RuntimeException ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
@@ -105,8 +104,9 @@ public class FleetController {
 
     @PostMapping("/trips/{tripId}/repair")
     public String requestRepair(@PathVariable Long tripId, RedirectAttributes redirectAttributes) {
+        TripRepairDTO repairDTO = tripCommandMapper.toRepairDto(tripId);
         try {
-            tripService.requestRepair(tripId);
+            tripService.requestRepair(repairDTO);
         } catch (RuntimeException ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }

@@ -283,21 +283,21 @@
                 <tbody>
                     <tr th:each="trip : ${activeTrips}">
                         <td th:text="${trip.id}"></td>
-                        <td th:text="${trip.driver.name}"></td>
-                        <td th:text="'ID: ' + ${trip.car.id} + ' (Cap: ' + ${#numbers.formatDecimal(trip.car.capacity, 0, 2)} + ')'"></td>
-                        <td th:text="${trip.order.destination}"></td>
-                        <td th:text="${trip.order.cargoType}"></td>
-                        <td th:text="${#numbers.formatDecimal(trip.order.weight, 0, 2)}"></td>
+                        <td th:text="${trip.driverName}"></td>
+                        <td th:text="'ID: ' + ${trip.carId} + ' (Cap: ' + ${#numbers.formatDecimal(trip.carCapacity, 0, 2)} + ')'"></td>
+                        <td th:text="${trip.destination}"></td>
+                        <td th:text="${trip.cargoType}"></td>
+                        <td th:text="${#numbers.formatDecimal(trip.weight, 0, 2)}"></td>
                         <td>
                             <span class="status-badge" 
-                                  th:classappend="${trip.status.name() == 'IN_PROGRESS'} ? 'status-in-progress' : 
-                                                  (${trip.status.name() == 'COMPLETED'} ? 'status-completed' : 
-                                                  (${trip.status.name() == 'BROKEN'} ? 'status-broken' : 'status-repair'))"
+                                  th:classappend="${trip.status == 'IN_PROGRESS'} ? 'status-in-progress' : 
+                                                  (${trip.status == 'COMPLETED'} ? 'status-completed' : 
+                                                  (${trip.status == 'BROKEN'} ? 'status-broken' : 'status-repair'))"
                                   th:text="${trip.status}"></span>
                         </td>
                         <td th:text="${#temporals.format(trip.startTime, 'dd.MM.yyyy HH:mm')}"></td>
                         <td>
-                            <div th:if="${trip.status.name() == 'IN_PROGRESS'}">
+                            <div th:if="${trip.status == 'IN_PROGRESS'}">
                                 <form th:action="@{'/fleet/trips/' + ${trip.id} + '/complete'}" method="post" style="display: inline;">
                                     <select name="carStatus" required style="padding: 4px; margin-right: 4px;">
                                         <option value="OK">OK</option>
@@ -309,7 +309,7 @@
                                     <button type="submit" class="btn btn-danger">Breakdown</button>
                                 </form>
                             </div>
-                            <div th:if="${trip.status.name() == 'BROKEN'}">
+                            <div th:if="${trip.status == 'BROKEN'}">
                                 <form th:action="@{'/fleet/trips/' + ${trip.id} + '/repair'}" method="post" style="display: inline;">
                                     <button type="submit" class="btn btn-warning">Request Repair</button>
                                 </form>
@@ -336,10 +336,10 @@
                 </thead>
                 <tbody>
                     <tr th:each="entry : ${driverPerformance}">
-                        <td th:text="${entry.key}"></td>
-                        <td th:text="${entry.value.tripCount}"></td>
-                        <td th:text="${#numbers.formatDecimal(entry.value.totalWeight, 0, 2)}"></td>
-                        <td th:text="${driverEarnings != null and driverEarnings[entry.key] != null ? #numbers.formatDecimal(driverEarnings[entry.key], 0, 2) : '0.00'}"></td>
+                        <td th:text="${entry.driverName}"></td>
+                        <td th:text="${entry.tripCount}"></td>
+                        <td th:text="${#numbers.formatDecimal(entry.totalWeight, 0, 2)}"></td>
+                        <td th:text="${#numbers.formatDecimal(entry.earnings, 0, 2)}"></td>
                     </tr>
                 </tbody>
             </table>
@@ -356,8 +356,8 @@
                 </thead>
                 <tbody>
                     <tr th:each="entry : ${cargoByDestination}">
-                        <td th:text="${entry.key}"></td>
-                        <td th:text="${entry.value}"></td>
+                        <td th:text="${entry.destination}"></td>
+                        <td th:text="${entry.cargoCount}"></td>
                     </tr>
                 </tbody>
             </table>

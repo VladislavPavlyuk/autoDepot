@@ -24,15 +24,25 @@ if (-not (Test-Path "mvnw.cmd")) {
     exit 1
 }
 
-# Stop any existing instance on port 8080
-Write-Host "Checking for existing process on port 8080..." -ForegroundColor Yellow
-$existingProcess = Get-NetTCPConnection -LocalPort 8080 -ErrorAction SilentlyContinue | 
-    Select-Object -ExpandProperty OwningProcess -Unique
+# Start Postgres via Docker Compose
+if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
+    Write-Host "ERROR: Docker is not installed or not in PATH" -ForegroundColor Red
+    Write-Host "Please install Docker Desktop" -ForegroundColor Red
+    Read-Host "Press Enter to exit"
+    exit 1
+}
 
-if ($existingProcess) {
-    Write-Host "Stopping process $existingProcess on port 8080..." -ForegroundColor Yellow
-    Stop-Process -Id $existingProcess -Force -ErrorAction SilentlyContinue
-    Start-Sleep -Seconds 2
+Write-Host "Starting Postgres (Docker Compose)..." -ForegroundColor Green
+docker compose up -d | Out-Null
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "ERROR: Failed to start Postgres via Docker Compose" -ForegroundColor Red
+    Read-Host "Press Enter to exit"
+    exit 1
+}
+
+# Remove stale PID file
+if (Test-Path "app.pid") {
+    Remove-Item "app.pid" -Force -ErrorAction SilentlyContinue
 }
 
 Write-Host ""
@@ -40,6 +50,6 @@ Write-Host "Building and starting application..." -ForegroundColor Green
 Write-Host ""
 
 # Run the application
-& .\mvnw.cmd spring-boot:run
+& .\mvnw.cmd spring-boot:run -Dspring-boot.run.arguments=--spring.pid.file=app.pid
 
 Read-Host "`nPress Enter to exit"

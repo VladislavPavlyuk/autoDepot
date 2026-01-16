@@ -19,21 +19,31 @@ if not exist "mvnw.cmd" (
     exit /b 1
 )
 
-REM Stop any existing instance on port 8080
-echo Checking for existing process on port 8080...
-for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8080 ^| findstr LISTENING') do (
-    echo Stopping process %%a on port 8080...
-    taskkill /F /PID %%a >nul 2>&1
+REM Start Postgres via Docker Compose
+docker --version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo ERROR: Docker is not installed or not in PATH
+    echo Please install Docker Desktop
+    pause
+    exit /b 1
 )
 
-REM Wait a moment for port to be released
-timeout /t 2 /nobreak >nul
+echo Starting Postgres (Docker Compose)...
+docker compose up -d
+if %errorlevel% neq 0 (
+    echo ERROR: Failed to start Postgres via Docker Compose
+    pause
+    exit /b 1
+)
+
+REM Remove stale PID file
+if exist "app.pid" del /f /q "app.pid" >nul 2>&1
 
 echo.
 echo Building and starting application...
 echo.
 
 REM Run the application
-call mvnw.cmd spring-boot:run
+call mvnw.cmd spring-boot:run -Dspring-boot.run.arguments=--spring.pid.file=app.pid
 
 pause

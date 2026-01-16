@@ -3,20 +3,24 @@
 Write-Host "Stopping Auto Depot Application..." -ForegroundColor Yellow
 Write-Host ""
 
-# Find and stop process on port 8080
-$existingProcess = Get-NetTCPConnection -LocalPort 8080 -ErrorAction SilentlyContinue | 
-    Select-Object -ExpandProperty OwningProcess -Unique
-
-if ($existingProcess) {
-    Write-Host "Stopping process $existingProcess on port 8080..." -ForegroundColor Yellow
-    Stop-Process -Id $existingProcess -Force
-    if ($?) {
-        Write-Host "Process stopped successfully." -ForegroundColor Green
-    } else {
-        Write-Host "Failed to stop process." -ForegroundColor Red
+# Stop Spring Boot by PID file
+if (Test-Path "app.pid") {
+    $appPid = Get-Content "app.pid" -ErrorAction SilentlyContinue
+    if ($appPid) {
+        Write-Host "Stopping process $appPid..." -ForegroundColor Yellow
+        Stop-Process -Id $appPid -Force -ErrorAction SilentlyContinue
+        if ($?) {
+            Write-Host "Process stopped successfully." -ForegroundColor Green
+        } else {
+            Write-Host "Failed to stop process." -ForegroundColor Red
+        }
     }
+    Remove-Item "app.pid" -Force -ErrorAction SilentlyContinue
 } else {
-    Write-Host "No process found on port 8080." -ForegroundColor Yellow
+    Write-Host "No PID file found (app.pid). Skipping app shutdown." -ForegroundColor Yellow
 }
+
+Write-Host "Stopping Postgres (Docker Compose)..." -ForegroundColor Yellow
+docker compose stop | Out-Null
 
 Read-Host "`nPress Enter to exit"

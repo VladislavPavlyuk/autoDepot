@@ -20,18 +20,26 @@ fi
 # Make mvnw executable
 chmod +x ./mvnw
 
-# Stop any existing instance on port 8080
-echo "Checking for existing process on port 8080..."
-PID=$(lsof -ti:8080 2>/dev/null || fuser 8080/tcp 2>/dev/null | awk '{print $1}' || echo "")
-if [ ! -z "$PID" ]; then
-    echo "Stopping process $PID on port 8080..."
-    kill -9 $PID 2>/dev/null || true
-    sleep 2
+# Start Postgres via Docker Compose
+if ! command -v docker &> /dev/null; then
+    echo "ERROR: Docker is not installed or not in PATH"
+    echo "Please install Docker Desktop"
+    exit 1
 fi
+
+echo "Starting Postgres (Docker Compose)..."
+docker compose up -d
+if [ $? -ne 0 ]; then
+    echo "ERROR: Failed to start Postgres via Docker Compose"
+    exit 1
+fi
+
+# Remove stale PID file
+rm -f ./app.pid
 
 echo ""
 echo "Building and starting application..."
 echo ""
 
 # Run the application
-./mvnw spring-boot:run
+./mvnw spring-boot:run -Dspring-boot.run.arguments=--spring.pid.file=app.pid

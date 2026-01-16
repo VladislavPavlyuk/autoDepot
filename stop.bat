@@ -2,19 +2,24 @@
 echo Stopping Auto Depot Application...
 echo.
 
-REM Find and stop process on port 8080
-for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8080 ^| findstr LISTENING') do (
-    echo Stopping process %%a on port 8080...
-    taskkill /F /PID %%a
-    if %errorlevel% equ 0 (
-        echo Process stopped successfully.
-    ) else (
-        echo Failed to stop process or process not found.
+REM Stop Spring Boot by PID file
+if exist "app.pid" (
+    set /p APP_PID=<app.pid
+    if not "%APP_PID%"=="" (
+        echo Stopping process %APP_PID%...
+        taskkill /F /PID %APP_PID% >nul 2>&1
+        if %errorlevel% equ 0 (
+            echo Process stopped successfully.
+        ) else (
+            echo Failed to stop process or process not found.
+        )
     )
-    goto :done
+    del /f /q "app.pid" >nul 2>&1
+) else (
+    echo No PID file found (app.pid). Skipping app shutdown.
 )
 
-echo No process found on port 8080.
+echo Stopping Postgres (Docker Compose)...
+docker compose stop >nul 2>&1
 
-:done
 pause

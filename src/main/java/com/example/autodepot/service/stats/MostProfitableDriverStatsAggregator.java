@@ -17,8 +17,8 @@ public class MostProfitableDriverStatsAggregator implements StatsAggregator {
     }
 
     @Override
-    public String getKey() {
-        return "mostProfitableDriver";
+    public StatsKey getKey() {
+        return StatsKey.MOST_PROFITABLE_DRIVER;
     }
 
     @Override

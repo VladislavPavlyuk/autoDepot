@@ -18,8 +18,8 @@ public class CargoByDestinationStatsAggregator implements StatsAggregator {
     }
 
     @Override
-    public String getKey() {
-        return "cargoByDestination";
+    public StatsKey getKey() {
+        return StatsKey.CARGO_BY_DESTINATION;
     }
 
     @Override

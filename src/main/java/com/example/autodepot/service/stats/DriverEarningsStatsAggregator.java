@@ -17,8 +17,8 @@ public class DriverEarningsStatsAggregator implements StatsAggregator {
     }
 
     @Override
-    public String getKey() {
-        return "driverEarnings";
+    public StatsKey getKey() {
+        return StatsKey.DRIVER_EARNINGS;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.example.autodepot.service.stats;
 
 public interface StatsAggregator {
-    String getKey();
+    StatsKey getKey();
     Object aggregate();
 }

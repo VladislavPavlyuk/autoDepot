@@ -2,6 +2,7 @@ package com.example.autodepot.service;
 
 import com.example.autodepot.entity.Order;
 import com.example.autodepot.repository.OrderRepository;
+import com.example.autodepot.service.generation.OrderCountStrategy;
 import com.example.autodepot.service.generation.OrderGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +22,9 @@ class OrderGenerationServiceTest {
 
     @Mock
     private OrderGenerator orderGenerator;
+
+    @Mock
+    private OrderCountStrategy orderCountStrategy;
 
     @InjectMocks
     private OrderGenerationService orderGenerationService;

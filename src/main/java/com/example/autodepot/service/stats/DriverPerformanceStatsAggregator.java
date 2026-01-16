@@ -16,8 +16,8 @@ public class DriverPerformanceStatsAggregator implements StatsAggregator {
     }
 
     @Override
-    public String getKey() {
-        return "driverPerformance";
+    public StatsKey getKey() {
+        return StatsKey.DRIVER_PERFORMANCE;
     }
 
     @Override

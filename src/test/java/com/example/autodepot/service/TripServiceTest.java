@@ -25,6 +25,7 @@ import com.example.autodepot.service.simulation.BreakdownSimulator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -33,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.any;
@@ -94,8 +95,7 @@ class TripServiceTest {
     }
 
     @Test
-    void testCreateTrip_Success() {
-        // Arrange
+    void createTrip_WhenValidOrderAndResourcesExist_CompletesSuccessfully() {
         when(orderService.findById(1L)).thenReturn(Optional.of(testOrder));
         when(driverService.findAvailableDrivers()).thenReturn(List.of(testDriver));
         when(carService.findAvailableCars()).thenReturn(List.of(testCar));
@@ -106,15 +106,19 @@ class TripServiceTest {
         when(tripDataService.save(any(Trip.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(driverService.save(any(Driver.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Act
         TripAssignDTO assignDTO = new TripAssignDTO();
         assignDTO.setOrderId(1L);
         TripAssignCommand assignCommand = new TripAssignCommand();
         assignCommand.setOrderId(1L);
         when(tripCommandMapper.toCommand(assignDTO)).thenReturn(assignCommand);
-        assertDoesNotThrow(() -> tripService.createTrip(assignDTO));
-
-        // Assert
+        boolean actualResult = true;
+        try {
+            tripService.createTrip(assignDTO);
+        } catch (RuntimeException ex) {
+            actualResult = false;
+        }
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
         verify(orderService, times(1)).findById(1L);
         verify(driverService, times(1)).findAvailableDrivers();
         verify(carService, times(1)).findAvailableCars();
@@ -123,43 +127,50 @@ class TripServiceTest {
     }
 
     @Test
-    void testCreateTrip_OrderNotFound() {
-        // Arrange
+    void createTrip_WhenOrderMissing_ThrowsNotFoundMessage() {
         when(orderService.findById(1L)).thenReturn(Optional.empty());
 
-        // Act & Assert
         TripAssignDTO assignDTO = new TripAssignDTO();
         assignDTO.setOrderId(1L);
         TripAssignCommand assignCommand = new TripAssignCommand();
         assignCommand.setOrderId(1L);
         when(tripCommandMapper.toCommand(assignDTO)).thenReturn(assignCommand);
-        RuntimeException exception = assertThrows(RuntimeException.class, 
-            () -> tripService.createTrip(assignDTO));
-        assertEquals("Order not found: 1", exception.getMessage());
+        String actualResult;
+        try {
+            tripService.createTrip(assignDTO);
+            actualResult = "no exception";
+        } catch (RuntimeException ex) {
+            actualResult = ex.getMessage();
+        }
+        String expectedResult = "Order not found: 1";
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
-    void testCreateTrip_NoAvailableDrivers() {
-        // Arrange
+    void createTrip_WhenNoAvailableDrivers_ThrowsNoDriversMessage() {
         when(orderService.findById(1L)).thenReturn(Optional.of(testOrder));
         when(driverService.findAvailableDrivers()).thenReturn(new ArrayList<>());
         when(driverSelectionPolicy.selectDriver(eq(testOrder), anyList()))
             .thenReturn(Optional.empty());
 
-        // Act & Assert
         TripAssignDTO assignDTO = new TripAssignDTO();
         assignDTO.setOrderId(1L);
         TripAssignCommand assignCommand = new TripAssignCommand();
         assignCommand.setOrderId(1L);
         when(tripCommandMapper.toCommand(assignDTO)).thenReturn(assignCommand);
-        RuntimeException exception = assertThrows(RuntimeException.class, 
-            () -> tripService.createTrip(assignDTO));
-        assertTrue(exception.getMessage().contains("No available drivers"));
+        String actualResult;
+        try {
+            tripService.createTrip(assignDTO);
+            actualResult = "no exception";
+        } catch (RuntimeException ex) {
+            actualResult = ex.getMessage();
+        }
+        String expectedResult = "No available drivers for order: 1";
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
-    void testCreateTrip_DriverExperienceRequirement() {
-        // Arrange
+    void createTrip_WhenHazardousOrder_SelectsSeniorDriver() {
         Order hazardousOrder = new Order("Los Angeles", "HAZARDOUS", 1000.0);
         hazardousOrder.setId(2L);
         
@@ -189,14 +200,16 @@ class TripServiceTest {
         when(tripCommandMapper.toCommand(assignDTO)).thenReturn(assignCommand);
         tripService.createTrip(assignDTO);
 
-        // Assert - Senior driver should be selected (experience >= 10)
-        verify(tripDataService, times(1)).save(argThat(trip -> 
-            trip.getDriver().getExperience() >= 10));
+        ArgumentCaptor<Trip> tripCaptor = ArgumentCaptor.forClass(Trip.class);
+        verify(tripDataService, times(1)).save(tripCaptor.capture());
+        Trip savedTrip = tripCaptor.getValue();
+        boolean actualResult = savedTrip.getDriver().getExperience() >= 10;
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
-    void testCompleteTrip_Success() {
-        // Arrange
+    void completeTrip_WhenInProgress_SetsCompletedAndPayment() {
         Trip trip = new Trip(testOrder, testDriver, testCar);
         trip.setId(1L);
         trip.setStatus(Trip.TripStatus.IN_PROGRESS);
@@ -217,19 +230,22 @@ class TripServiceTest {
         when(tripCommandMapper.toCommand(completeDTO)).thenReturn(completeCommand);
         tripService.completeTrip(completeDTO);
 
-        // Assert
-        verify(tripDataService, times(1)).findById(1L);
-        verify(tripDataService, times(1)).save(argThat(t -> 
-            t.getStatus() == Trip.TripStatus.COMPLETED && 
-            t.getPayment() != null &&
-            t.getCarStatusAfterTrip().equals("OK")));
-        verify(driverService, times(1)).save(argThat(d -> d.isAvailable()));
-        verify(carService, times(1)).save(any(Car.class));
+        ArgumentCaptor<Trip> tripCaptor = ArgumentCaptor.forClass(Trip.class);
+        ArgumentCaptor<Driver> driverCaptor = ArgumentCaptor.forClass(Driver.class);
+        verify(tripDataService, times(1)).save(tripCaptor.capture());
+        verify(driverService, times(1)).save(driverCaptor.capture());
+        Trip savedTrip = tripCaptor.getValue();
+        Driver savedDriver = driverCaptor.getValue();
+        boolean actualResult = savedTrip.getStatus() == Trip.TripStatus.COMPLETED
+            && savedTrip.getPayment() != null
+            && "OK".equals(savedTrip.getCarStatusAfterTrip())
+            && savedDriver.isAvailable();
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
-    void testProcessBreakdown() {
-        // Arrange
+    void processBreakdown_WhenTripInProgress_SetsBrokenAndCarBroken() {
         Trip trip = new Trip(testOrder, testDriver, testCar);
         trip.setId(1L);
         trip.setStatus(Trip.TripStatus.IN_PROGRESS);
@@ -246,15 +262,20 @@ class TripServiceTest {
         when(tripCommandMapper.toCommand(breakdownDTO)).thenReturn(breakdownCommand);
         tripService.processBreakdown(breakdownDTO);
 
-        // Assert
-        verify(tripDataService, times(1)).save(argThat(t -> 
-            t.getStatus() == Trip.TripStatus.BROKEN));
-        verify(carService, times(1)).save(argThat(c -> c.isBroken()));
+        ArgumentCaptor<Trip> tripCaptor = ArgumentCaptor.forClass(Trip.class);
+        ArgumentCaptor<Car> carCaptor = ArgumentCaptor.forClass(Car.class);
+        verify(tripDataService, times(1)).save(tripCaptor.capture());
+        verify(carService, times(1)).save(carCaptor.capture());
+        Trip savedTrip = tripCaptor.getValue();
+        Car savedCar = carCaptor.getValue();
+        boolean actualResult = savedTrip.getStatus() == Trip.TripStatus.BROKEN
+            && savedCar.isBroken();
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
-    void testRequestRepair() {
-        // Arrange
+    void requestRepair_WhenTripBroken_SetsRepairRequested() {
         Trip trip = new Trip(testOrder, testDriver, testCar);
         trip.setId(1L);
         trip.setStatus(Trip.TripStatus.BROKEN);
@@ -270,8 +291,11 @@ class TripServiceTest {
         when(tripCommandMapper.toCommand(repairDTO)).thenReturn(repairCommand);
         tripService.requestRepair(repairDTO);
 
-        // Assert
-        verify(tripDataService, times(1)).save(argThat(t -> 
-            t.getStatus() == Trip.TripStatus.REPAIR_REQUESTED));
+        ArgumentCaptor<Trip> tripCaptor = ArgumentCaptor.forClass(Trip.class);
+        verify(tripDataService, times(1)).save(tripCaptor.capture());
+        Trip savedTrip = tripCaptor.getValue();
+        boolean actualResult = savedTrip.getStatus() == Trip.TripStatus.REPAIR_REQUESTED;
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
     }
 }

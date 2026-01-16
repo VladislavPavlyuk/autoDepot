@@ -9,8 +9,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.ArgumentCaptor;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -30,35 +31,40 @@ class OrderGenerationServiceTest {
     private OrderGenerationService orderGenerationService;
 
     @Test
-    void testGenerateRandomOrder() {
-        // Arrange
-        when(orderGenerator.generate()).thenReturn(new Order("New York", "STANDARD", 1000.0));
+    void generateRandomOrder_WhenCalled_SavesGeneratedOrder() {
+        Order generatedOrder = new Order("New York", "STANDARD", 1000.0);
+        when(orderGenerator.generate()).thenReturn(generatedOrder);
         when(orderService.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Act
         orderGenerationService.generateRandomOrder();
 
-        // Assert
-        verify(orderService, times(1)).save(any(Order.class));
+        ArgumentCaptor<Order> orderCaptor = ArgumentCaptor.forClass(Order.class);
+        verify(orderService, times(1)).save(orderCaptor.capture());
+        Order actualOrder = orderCaptor.getValue();
+        Order expectedOrder = generatedOrder;
+
+        boolean actualResult = actualOrder == expectedOrder;
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
-    void testGenerateRandomOrder_ValidOrder() {
-        // Arrange
+    void generateRandomOrder_WhenGeneratedOrderValid_SavesOrderWithValidFields() {
         Order generatedOrder = new Order("Chicago", "FRAGILE", 2500.0);
         when(orderGenerator.generate()).thenReturn(generatedOrder);
-        when(orderService.save(any(Order.class))).thenAnswer(invocation -> {
-            Order order = invocation.getArgument(0);
-            assertNotNull(order.getDestination());
-            assertNotNull(order.getCargoType());
-            assertTrue(order.getWeight() >= 500 && order.getWeight() <= 5000);
-            return order;
-        });
+        when(orderService.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Act
         orderGenerationService.generateRandomOrder();
 
-        // Assert
-        verify(orderService, times(1)).save(any(Order.class));
+        ArgumentCaptor<Order> orderCaptor = ArgumentCaptor.forClass(Order.class);
+        verify(orderService, times(1)).save(orderCaptor.capture());
+        Order actualOrder = orderCaptor.getValue();
+
+        boolean actualResult = actualOrder.getDestination() != null
+            && actualOrder.getCargoType() != null
+            && actualOrder.getWeight() >= 500
+            && actualOrder.getWeight() <= 5000;
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
     }
 }

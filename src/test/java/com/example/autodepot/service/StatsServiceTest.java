@@ -10,6 +10,7 @@ import com.example.autodepot.dto.CargoByDestinationDTO;
 import com.example.autodepot.dto.DriverEarningsDTO;
 import com.example.autodepot.dto.DriverPerformanceDTO;
 import com.example.autodepot.dto.StatsSummaryDTO;
+import com.example.autodepot.mapper.StatsMapper;
 import com.example.autodepot.service.stats.CargoByDestinationStatsAggregator;
 import com.example.autodepot.service.stats.DriverEarningsStatsAggregator;
 import com.example.autodepot.service.stats.DriverPerformanceStatsAggregator;
@@ -74,95 +75,87 @@ class StatsServiceTest {
             new DriverEarningsStatsAggregator(driverService),
             new MostProfitableDriverStatsAggregator(driverService)
         );
-        statsService = new StatsService(new StatsKeyRegistry(aggregators));
+        StatsMapper statsMapper = new StatsMapper() {
+        };
+        statsService = new StatsService(new StatsKeyRegistry(aggregators), statsMapper);
     }
 
     @Test
-    void testGetDriverPerformance() {
-        // Arrange
+    void getDriverPerformance_WhenStatsAvailable_ReturnsExpectedDriverStats() {
         Object[] stat1 = new Object[]{"John Smith", 5L, 5000.0};
         Object[] stat2 = new Object[]{"Michael Johnson", 3L, 6000.0};
         when(tripDataService.findStatsByDriver()).thenReturn(Arrays.asList(stat1, stat2));
 
-        // Act
         List<DriverPerformanceDTO> performance = statsService.getDriverPerformance();
 
-        // Assert
-        assertNotNull(performance);
-        assertEquals(2, performance.size());
         DriverPerformanceDTO johnStats = performance.stream()
             .filter(dto -> "John Smith".equals(dto.getDriverName()))
             .findFirst()
-            .orElseThrow();
-        assertEquals(5L, johnStats.getTripCount());
-        assertEquals(5000.0, johnStats.getTotalWeight());
+            .orElse(null);
+        boolean actualResult = performance.size() == 2
+            && johnStats != null
+            && johnStats.getTripCount() == 5L
+            && johnStats.getTotalWeight() == 5000.0;
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
-    void testGetCargoByDestination() {
-        // Arrange
+    void getCargoByDestination_WhenCompletedTripsExist_ReturnsExpectedCounts() {
         when(tripDataService.findAll()).thenReturn(Arrays.asList(completedTrip1, completedTrip2));
 
-        // Act
         List<CargoByDestinationDTO> cargoByDestination = statsService.getCargoByDestination();
 
-        // Assert
-        assertNotNull(cargoByDestination);
-        assertEquals(2, cargoByDestination.size());
         CargoByDestinationDTO la = cargoByDestination.stream()
             .filter(dto -> "Los Angeles".equals(dto.getDestination()))
             .findFirst()
-            .orElseThrow();
-        assertEquals(1L, la.getCargoCount());
+            .orElse(null);
+        boolean actualResult = cargoByDestination.size() == 2
+            && la != null
+            && la.getCargoCount() == 1L;
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
-    void testGetDriverEarnings() {
-        // Arrange
+    void getDriverEarnings_WhenDriversExist_ReturnsExpectedEarnings() {
         when(driverService.findAll()).thenReturn(Arrays.asList(driver1, driver2));
 
-        // Act
         List<DriverEarningsDTO> earnings = statsService.getDriverEarnings();
 
-        // Assert
-        assertNotNull(earnings);
-        assertEquals(2, earnings.size());
         DriverEarningsDTO john = earnings.stream()
             .filter(dto -> "John Smith".equals(dto.getDriverName()))
             .findFirst()
-            .orElseThrow();
-        assertEquals(500.0, john.getEarnings());
+            .orElse(null);
+        boolean actualResult = earnings.size() == 2
+            && john != null
+            && john.getEarnings() == 500.0;
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
-    void testGetMostProfitable() {
-        // Arrange
+    void getMostProfitable_WhenDriversExist_ReturnsTopDriverSummary() {
         when(driverService.findAll()).thenReturn(Arrays.asList(driver1, driver2));
 
-        // Act
-        String mostProfitable = statsService.getMostProfitable();
+        String actualResult = statsService.getMostProfitable();
+        String expectedResult = "Michael Johnson ($750.00)";
 
-        // Assert
-        assertNotNull(mostProfitable);
-        assertTrue(mostProfitable.contains("Michael Johnson"));
-        assertTrue(mostProfitable.contains("750.00"));
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
-    void testGetMostProfitable_NoData() {
-        // Arrange
+    void getMostProfitable_WhenNoDrivers_ReturnsNoDataMessage() {
         when(driverService.findAll()).thenReturn(List.of());
 
-        // Act
-        String mostProfitable = statsService.getMostProfitable();
+        String actualResult = statsService.getMostProfitable();
+        String expectedResult = "No data available";
 
-        // Assert
-        assertEquals("No data available", mostProfitable);
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
-    void testGetAllStats() {
-        // Arrange
+    void getAllStats_WhenDataAvailable_ReturnsAllStatSections() {
         Object[] stat = new Object[]{"John Smith", 5L, 5000.0};
         List<Object[]> statsList = new ArrayList<>();
         statsList.add(stat);
@@ -170,14 +163,13 @@ class StatsServiceTest {
         when(tripDataService.findAll()).thenReturn(Arrays.asList(completedTrip1));
         when(driverService.findAll()).thenReturn(Arrays.asList(driver1));
 
-        // Act
         StatsSummaryDTO allStats = statsService.getAllStats();
 
-        // Assert
-        assertNotNull(allStats);
-        assertNotNull(allStats.getDriverPerformance());
-        assertNotNull(allStats.getCargoByDestination());
-        assertNotNull(allStats.getDriverEarnings());
-        assertNotNull(allStats.getMostProfitableDriver());
+        boolean actualResult = allStats.getDriverPerformance() != null
+            && allStats.getCargoByDestination() != null
+            && allStats.getDriverEarnings() != null
+            && allStats.getMostProfitableDriver() != null;
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
     }
 }

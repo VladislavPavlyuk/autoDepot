@@ -80,3 +80,15 @@
 [2026-01-16 13:22:36] REPAIR_REQUESTED - Trip ID: 2, Driver: John Smith, Car ID: 2, Order: HAZARDOUS -> Philadelphia, Weight: 3106.39 kg, Status: REPAIR_REQUESTED
 [2026-01-16 13:22:38] TRIP_COMPLETED - Trip ID: 3, Driver: Michael Johnson, Car ID: 2, Order: OVERSIZED -> Chicago, Weight: 2753.50 kg, Status: COMPLETED
   Payment: 357955.46, Car Status: OK
+[2026-01-16 17:44:32] TRIP_STARTED - Trip ID: 6, Driver: David Williams, Car ID: 3, Order: STANDARD -> Houston, Weight: 4582.90 kg, Status: IN_PROGRESS
+[2026-01-16 17:44:39] TRIP_STARTED - Trip ID: 7, Driver: Michael Johnson, Car ID: 3, Order: OVERSIZED -> Los Angeles, Weight: 4060.19 kg, Status: IN_PROGRESS
+[2026-01-16 17:44:45] TRIP_COMPLETED - Trip ID: 7, Driver: Michael Johnson, Car ID: 3, Order: OVERSIZED -> Los Angeles, Weight: 4060.19 kg, Status: COMPLETED
+  Payment: 527824.61, Car Status: OK
+[2026-01-16 17:44:47] TRIP_COMPLETED - Trip ID: 6, Driver: David Williams, Car ID: 3, Order: STANDARD -> Houston, Weight: 4582.90 kg, Status: COMPLETED
+  Payment: 458289.84, Car Status: OK
+[2026-01-16 17:44:49] TRIP_STARTED - Trip ID: 8, Driver: David Williams, Car ID: 3, Order: HAZARDOUS -> Chicago, Weight: 4649.21 kg, Status: IN_PROGRESS
+[2026-01-16 17:44:55] TRIP_COMPLETED - Trip ID: 8, Driver: David Williams, Car ID: 3, Order: HAZARDOUS -> Chicago, Weight: 4649.21 kg, Status: COMPLETED
+  Payment: 929841.75, Car Status: OK
+[2026-01-16 17:44:57] TRIP_STARTED - Trip ID: 9, Driver: David Williams, Car ID: 1, Order: HAZARDOUS -> Philadelphia, Weight: 1804.35 kg, Status: IN_PROGRESS
+[2026-01-16 17:45:00] BREAKDOWN - Trip ID: 9, Driver: David Williams, Car ID: 1, Order: HAZARDOUS -> Philadelphia, Weight: 1804.35 kg, Status: BROKEN
+[2026-01-16 17:45:05] REPAIR_REQUESTED - Trip ID: 9, Driver: David Williams, Car ID: 1, Order: HAZARDOUS -> Philadelphia, Weight: 1804.35 kg, Status: REPAIR_REQUESTED

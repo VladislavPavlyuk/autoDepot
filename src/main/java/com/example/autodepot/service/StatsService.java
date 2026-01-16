@@ -1,88 +1,71 @@
 package com.example.autodepot.service;
 
-import com.example.autodepot.entity.Driver;
-import com.example.autodepot.entity.Trip;
-import com.example.autodepot.repository.DriverRepository;
-import com.example.autodepot.repository.TripRepository;
+import com.example.autodepot.service.stats.StatsAggregator;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class StatsService {
-    private final TripRepository tripRepo;
-    private final DriverRepository driverRepository;
+    private final Map<String, StatsAggregator> aggregatorsByKey;
 
-    public StatsService(TripRepository tripRepo, DriverRepository driverRepository) {
-        this.tripRepo = tripRepo;
-        this.driverRepository = driverRepository;
+    public StatsService(List<StatsAggregator> aggregators) {
+        this.aggregatorsByKey = new HashMap<>();
+        for (StatsAggregator aggregator : aggregators) {
+            String key = aggregator.getKey();
+            if (aggregatorsByKey.containsKey(key)) {
+                throw new IllegalStateException("Duplicate stats aggregator key: " + key);
+            }
+            aggregatorsByKey.put(key, aggregator);
+        }
     }
 
     public Map<String, Object> getDriverPerformance() {
-        List<Object[]> stats = tripRepo.findStatsByDriver();
-        Map<String, Object> performance = new HashMap<>();
-        
-        for (Object[] stat : stats) {
-            String driverName = (String) stat[0];
-            Long tripCount = (Long) stat[1];
-            Double totalWeight = ((Number) stat[2]).doubleValue();
-            
-            Map<String, Object> driverStats = new HashMap<>();
-            driverStats.put("tripCount", tripCount);
-            driverStats.put("totalWeight", totalWeight);
-            performance.put(driverName, driverStats);
-        }
-        
-        return performance;
+        return getStatMap("driverPerformance");
     }
 
     public Map<String, Long> getCargoByDestination() {
-        List<Trip> completedTrips = tripRepo.findAll().stream()
-            .filter(t -> t.getStatus() == Trip.TripStatus.COMPLETED)
-            .collect(Collectors.toList());
-
-        Map<String, Long> destinationStats = new HashMap<>();
-        for (Trip trip : completedTrips) {
-            String destination = trip.getOrder().getDestination();
-            destinationStats.merge(destination, 1L, (a, b) -> a + b);
-        }
-
-        return destinationStats;
+        return getStatMap("cargoByDestination");
     }
 
     public Map<String, Double> getDriverEarnings() {
-        List<Driver> drivers = driverRepository.findAll();
-        Map<String, Double> earnings = new HashMap<>();
-        
-        for (Driver driver : drivers) {
-            earnings.put(driver.getName(), driver.getEarnings());
-        }
-        
-        return earnings;
+        return getStatMap("driverEarnings");
     }
 
     public String getMostProfitable() {
-        Map<String, Double> earnings = getDriverEarnings();
-        
-        if (earnings.isEmpty()) {
-            return "No data available";
-        }
-
-        String mostProfitableDriver = earnings.entrySet().stream()
-            .max(Map.Entry.comparingByValue())
-            .map(e -> e.getKey() + " ($" + String.format("%.2f", e.getValue()) + ")")
-            .orElse("No data available");
-
-        return mostProfitableDriver;
+        return getStatString("mostProfitableDriver");
     }
 
     public Map<String, Object> getAllStats() {
         Map<String, Object> allStats = new HashMap<>();
-        allStats.put("driverPerformance", getDriverPerformance());
-        allStats.put("cargoByDestination", getCargoByDestination());
-        allStats.put("driverEarnings", getDriverEarnings());
-        allStats.put("mostProfitableDriver", getMostProfitable());
+        for (StatsAggregator aggregator : aggregatorsByKey.values()) {
+            allStats.put(aggregator.getKey(), aggregator.aggregate());
+        }
         return allStats;
+    }
+
+    private String getStatString(String key) {
+        return getStat(key, String.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <K, V> Map<K, V> getStatMap(String key) {
+        return (Map<K, V>) getStat(key, Map.class);
+    }
+
+    private <T> T getStat(String key, Class<T> type) {
+        StatsAggregator aggregator = aggregatorsByKey.get(key);
+        if (aggregator == null) {
+            throw new IllegalStateException("Missing stats aggregator: " + key);
+        }
+
+        Object value = aggregator.aggregate();
+        if (!type.isInstance(value)) {
+            throw new IllegalStateException("Stats type mismatch for key: " + key);
+        }
+
+        return type.cast(value);
     }
 }

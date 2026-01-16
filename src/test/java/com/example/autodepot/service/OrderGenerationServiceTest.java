@@ -2,7 +2,7 @@ package com.example.autodepot.service;
 
 import com.example.autodepot.entity.Order;
 import com.example.autodepot.repository.OrderRepository;
-import org.junit.jupiter.api.BeforeEach;
+import com.example.autodepot.service.generation.OrderGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,12 +19,16 @@ class OrderGenerationServiceTest {
     @Mock
     private OrderRepository orderRepository;
 
+    @Mock
+    private OrderGenerator orderGenerator;
+
     @InjectMocks
     private OrderGenerationService orderGenerationService;
 
     @Test
     void testGenerateRandomOrder() {
         // Arrange
+        when(orderGenerator.generate()).thenReturn(new Order("New York", "STANDARD", 1000.0));
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
@@ -37,6 +41,8 @@ class OrderGenerationServiceTest {
     @Test
     void testGenerateRandomOrder_ValidOrder() {
         // Arrange
+        Order generatedOrder = new Order("Chicago", "FRAGILE", 2500.0);
+        when(orderGenerator.generate()).thenReturn(generatedOrder);
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
             Order order = invocation.getArgument(0);
             assertNotNull(order.getDestination());

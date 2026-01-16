@@ -1,0 +1,39 @@
+package com.example.autodepot.service.stats;
+
+import com.example.autodepot.entity.Trip;
+import com.example.autodepot.repository.TripRepository;
+import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Component
+public class CargoByDestinationStatsAggregator implements StatsAggregator {
+    private final TripRepository tripRepo;
+
+    public CargoByDestinationStatsAggregator(TripRepository tripRepo) {
+        this.tripRepo = tripRepo;
+    }
+
+    @Override
+    public String getKey() {
+        return "cargoByDestination";
+    }
+
+    @Override
+    public Object aggregate() {
+        List<Trip> completedTrips = tripRepo.findAll().stream()
+            .filter(t -> t.getStatus() == Trip.TripStatus.COMPLETED)
+            .collect(Collectors.toList());
+
+        Map<String, Long> destinationStats = new HashMap<>();
+        for (Trip trip : completedTrips) {
+            String destination = trip.getOrder().getDestination();
+            destinationStats.merge(destination, 1L, (a, b) -> a + b);
+        }
+
+        return destinationStats;
+    }
+}

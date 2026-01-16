@@ -1,30 +1,21 @@
 package com.example.autodepot.service;
 
-import com.example.autodepot.entity.Order;
 import com.example.autodepot.repository.OrderRepository;
+import com.example.autodepot.service.generation.OrderGenerator;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 @Service
 public class OrderGenerationService {
     private final OrderRepository orderRepository;
+    private final OrderGenerator orderGenerator;
     private final Random random = new Random();
 
-    private static final List<String> DESTINATIONS = Arrays.asList(
-        "New York", "Los Angeles", "Chicago", "Houston", 
-        "Phoenix", "Philadelphia", "San Antonio", "San Diego"
-    );
-
-    private static final List<String> CARGO_TYPES = Arrays.asList(
-        "STANDARD", "FRAGILE", "HAZARDOUS", "OVERSIZED"
-    );
-
-    public OrderGenerationService(OrderRepository orderRepository) {
+    public OrderGenerationService(OrderRepository orderRepository, OrderGenerator orderGenerator) {
         this.orderRepository = orderRepository;
+        this.orderGenerator = orderGenerator;
     }
 
     @Scheduled(cron = "0 0 9 * * ?")
@@ -32,21 +23,11 @@ public class OrderGenerationService {
         int orderCount = random.nextInt(5) + 3;
 
         for (int i = 0; i < orderCount; i++) {
-            String destination = DESTINATIONS.get(random.nextInt(DESTINATIONS.size()));
-            String cargoType = CARGO_TYPES.get(random.nextInt(CARGO_TYPES.size()));
-            double weight = 500 + random.nextDouble() * 4500;
-
-            Order order = new Order(destination, cargoType, weight);
-            orderRepository.save(order);
+            orderRepository.save(orderGenerator.generate());
         }
     }
 
     public void generateRandomOrder() {
-        String destination = DESTINATIONS.get(random.nextInt(DESTINATIONS.size()));
-        String cargoType = CARGO_TYPES.get(random.nextInt(CARGO_TYPES.size()));
-        double weight = 500 + random.nextDouble() * 4500;
-
-        Order order = new Order(destination, cargoType, weight);
-        orderRepository.save(order);
+        orderRepository.save(orderGenerator.generate());
     }
 }

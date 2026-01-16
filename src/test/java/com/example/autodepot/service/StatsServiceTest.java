@@ -6,10 +6,14 @@ import com.example.autodepot.entity.Order;
 import com.example.autodepot.entity.Trip;
 import com.example.autodepot.repository.DriverRepository;
 import com.example.autodepot.repository.TripRepository;
+import com.example.autodepot.service.stats.CargoByDestinationStatsAggregator;
+import com.example.autodepot.service.stats.DriverEarningsStatsAggregator;
+import com.example.autodepot.service.stats.DriverPerformanceStatsAggregator;
+import com.example.autodepot.service.stats.MostProfitableDriverStatsAggregator;
+import com.example.autodepot.service.stats.StatsAggregator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -30,7 +34,6 @@ class StatsServiceTest {
     @Mock
     private DriverRepository driverRepository;
 
-    @InjectMocks
     private StatsService statsService;
 
     private Driver driver1;
@@ -60,6 +63,14 @@ class StatsServiceTest {
         completedTrip2.setId(2L);
         completedTrip2.setStatus(Trip.TripStatus.COMPLETED);
         completedTrip2.setPayment(300.0);
+
+        List<StatsAggregator> aggregators = Arrays.asList(
+            new DriverPerformanceStatsAggregator(tripRepo),
+            new CargoByDestinationStatsAggregator(tripRepo),
+            new DriverEarningsStatsAggregator(driverRepository),
+            new MostProfitableDriverStatsAggregator(driverRepository)
+        );
+        statsService = new StatsService(aggregators);
     }
 
     @Test

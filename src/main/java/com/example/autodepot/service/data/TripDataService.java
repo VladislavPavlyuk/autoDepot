@@ -1,37 +1,18 @@
 package com.example.autodepot.service.data;
 
 import com.example.autodepot.entity.Trip;
-import com.example.autodepot.repository.TripRepository;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-@Service
-public class TripDataService {
-    private final TripRepository tripRepository;
+public interface TripDataService {
+    Optional<Trip> findById(Long id);
 
-    public TripDataService(TripRepository tripRepository) {
-        this.tripRepository = tripRepository;
-    }
+    Trip save(Trip trip);
 
-    public Optional<Trip> findById(Long id) {
-        return tripRepository.findById(id);
-    }
+    List<Trip> findAll();
 
-    public Trip save(Trip trip) {
-        return tripRepository.save(trip);
-    }
+    boolean existsByOrderId(Long orderId);
 
-    public List<Trip> findAll() {
-        return tripRepository.findAll();
-    }
-
-    public boolean existsByOrderId(Long orderId) {
-        return tripRepository.existsByOrderId(orderId);
-    }
-
-    public List<Object[]> findStatsByDriver() {
-        return tripRepository.findStatsByDriver();
-    }
+    List<Object[]> findStatsByDriver();
 }

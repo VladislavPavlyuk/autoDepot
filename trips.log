@@ -92,3 +92,9 @@
 [2026-01-16 17:44:57] TRIP_STARTED - Trip ID: 9, Driver: David Williams, Car ID: 1, Order: HAZARDOUS -> Philadelphia, Weight: 1804.35 kg, Status: IN_PROGRESS
 [2026-01-16 17:45:00] BREAKDOWN - Trip ID: 9, Driver: David Williams, Car ID: 1, Order: HAZARDOUS -> Philadelphia, Weight: 1804.35 kg, Status: BROKEN
 [2026-01-16 17:45:05] REPAIR_REQUESTED - Trip ID: 9, Driver: David Williams, Car ID: 1, Order: HAZARDOUS -> Philadelphia, Weight: 1804.35 kg, Status: REPAIR_REQUESTED
+[2026-01-17 19:53:13] TRIP_STARTED - Trip ID: 10, Driver: Michael Johnson, Car ID: 4, Order: FRAGILE -> New York, Weight: 1436.02 kg, Status: IN_PROGRESS
+[2026-01-17 19:53:15] TRIP_STARTED - Trip ID: 11, Driver: James Davis, Car ID: 5, Order: FRAGILE -> New York, Weight: 1723.62 kg, Status: IN_PROGRESS
+[2026-01-17 19:53:23] TRIP_COMPLETED - Trip ID: 11, Driver: James Davis, Car ID: 5, Order: FRAGILE -> New York, Weight: 1723.62 kg, Status: COMPLETED
+  Payment: 258542.99, Car Status: OK
+[2026-01-17 19:53:25] TRIP_COMPLETED - Trip ID: 10, Driver: Michael Johnson, Car ID: 4, Order: FRAGILE -> New York, Weight: 1436.02 kg, Status: COMPLETED
+  Payment: 215402.77, Car Status: OK

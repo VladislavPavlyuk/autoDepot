@@ -12,6 +12,7 @@ public class TripViewDTO {
     private double weight;
     private String status;
     private LocalDateTime startTime;
+    private Double payment;
 
     public Long getId() {
         return id;
@@ -83,5 +84,13 @@ public class TripViewDTO {
 
     public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
+    }
+
+    public Double getPayment() {
+        return payment;
+    }
+
+    public void setPayment(Double payment) {
+        this.payment = payment;
     }
 }

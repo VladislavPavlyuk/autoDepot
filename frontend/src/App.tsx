@@ -7,10 +7,11 @@ import OrdersTable from "./components/OrdersTable";
 import StatCard from "./components/StatCard";
 import TopBar from "./components/TopBar";
 import TripsTable from "./components/TripsTable";
+import { createOrder } from "./api/dashboardApi";
 import { useDashboardData } from "./hooks/useDashboardData";
 
 const App = () => {
-  const { data } = useDashboardData();
+  const { data, refetch } = useDashboardData();
   const [search, setSearch] = useState("");
   const [currentTime, setCurrentTime] = useState("");
 
@@ -41,11 +42,43 @@ const App = () => {
   }, [data, search]);
 
   const handleCreateOrder = async () => {
-    await Swal.fire({
-      icon: "info",
-      title: "Order dialog",
-      text: "Connect this to your OrderApplicationService endpoint."
+    const result = await Swal.fire({
+      title: "Create order",
+      html:
+        '<input id="order-destination" class="swal2-input" placeholder="Destination">' +
+        '<input id="order-cargo" class="swal2-input" placeholder="Cargo type">' +
+        '<input id="order-weight" class="swal2-input" placeholder="Weight (kg)" type="number" min="0" step="0.1">',
+      focusConfirm: false,
+      showCancelButton: true,
+      preConfirm: () => {
+        const popup = Swal.getPopup();
+        const destination = popup?.querySelector<HTMLInputElement>("#order-destination")?.value?.trim();
+        const cargoType = popup?.querySelector<HTMLInputElement>("#order-cargo")?.value?.trim();
+        const weightValue = popup?.querySelector<HTMLInputElement>("#order-weight")?.value;
+        const weight = weightValue ? Number(weightValue) : NaN;
+
+        if (!destination || !cargoType || Number.isNaN(weight) || weight <= 0) {
+          Swal.showValidationMessage("Enter destination, cargo type, and a valid weight.");
+          return null;
+        }
+
+        return { destination, cargoType, weight };
+      }
     });
+
+    if (!result.isConfirmed || !result.value) {
+      return;
+    }
+
+    await createOrder(result.value);
+    await Swal.fire({
+      icon: "success",
+      title: "Order created",
+      text: "The order is now in the dispatch queue.",
+      timer: 1600,
+      showConfirmButton: false
+    });
+    refetch();
   };
 
   const handleExport = async () => {
@@ -77,12 +110,16 @@ const App = () => {
         </section>
 
         <section className="grid two-columns">
-          <OrdersTable orders={filteredOrders} />
-          <TripsTable trips={filteredTrips} />
+          <OrdersTable orders={filteredOrders} onSuccess={refetch} />
+          <TripsTable trips={filteredTrips} onSuccess={refetch} />
         </section>
 
         <section className="grid two-columns">
-          <ActionCenter />
+          <ActionCenter
+            orders={data?.orders ?? []}
+            trips={data?.trips ?? []}
+            onSuccess={refetch}
+          />
           <ActivityFeed items={data?.activity ?? []} />
         </section>
       </main>

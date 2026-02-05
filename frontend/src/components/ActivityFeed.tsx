@@ -10,9 +10,11 @@ const ActivityFeed = ({ items }: ActivityFeedProps) => {
         <span className="muted">Last 30 minutes</span>
       </div>
       <ul className="activity">
-        {items.map((item) => (
-          <li key={item}>{item}</li>
-        ))}
+        {items.length === 0 ? (
+          <li className="muted">No activity yet.</li>
+        ) : (
+          items.map((item) => <li key={item}>{item}</li>)
+        )}
       </ul>
     </div>
   );

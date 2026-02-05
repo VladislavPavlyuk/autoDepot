@@ -1,23 +1,37 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
+### Maven / Java ###
+/target/
 !**/src/main/**/target/
 !**/src/test/**/target/
+*.class
+*.log
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+### Spring / Misc ###
+HELP.md
 
-### IntelliJ IDEA ###
-.idea
+### Node / Frontend ###
+/frontend/node_modules/
+/frontend/dist/
+/frontend/.vite/
+/frontend/.cache/
+*.tsbuildinfo
+
+### Logs ###
+*.log
+trips.log
+
+### IDEs ###
+.idea/
 *.iws
 *.iml
 *.ipr
+.vscode/
+.classpath
+.project
+.settings/
+.factorypath
+.apt_generated
+.springBeans
+.sts4-cache
 
 ### NetBeans ###
 /nbproject/private/
@@ -25,9 +39,13 @@ target/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
+/build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
-.vscode/
+### OS ###
+.DS_Store
+Thumbs.db
+
+### Env ###
+.env

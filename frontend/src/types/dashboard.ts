@@ -6,6 +6,7 @@ export type StatCard = {
 
 export type OrderRow = {
   id: string;
+  orderId?: number;
   cargo: string;
   destination: string;
   weight: string;
@@ -14,9 +15,10 @@ export type OrderRow = {
 
 export type TripRow = {
   id: string;
+  tripId?: number;
   driver: string;
   car: string;
-  status: "Completed" | "Repair Requested";
+  status: "Completed" | "Repair Requested" | "In progress" | "Broken";
   payment: string;
 };
 

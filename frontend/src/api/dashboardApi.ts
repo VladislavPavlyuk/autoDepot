@@ -12,12 +12,19 @@ type CompleteTripPayload = {
   carStatus: string;
 };
 
+type CreateDriverPayload = {
+  name: string;
+  licenseYear: number;
+  licenseCategories: string[];
+};
+
 const normalizeDashboard = (data?: Partial<DashboardData> | null): DashboardData => {
   return {
     stats: Array.isArray(data?.stats) ? data?.stats : [],
     orders: Array.isArray(data?.orders) ? data?.orders : [],
     trips: Array.isArray(data?.trips) ? data?.trips : [],
-    activity: Array.isArray(data?.activity) ? data?.activity : []
+    activity: Array.isArray(data?.activity) ? data?.activity : [],
+    driverPerformance: Array.isArray(data?.driverPerformance) ? data?.driverPerformance : []
   };
 };
 
@@ -32,6 +39,18 @@ export const createOrder = async (payload: CreateOrderPayload): Promise<void> =>
 
 export const generateOrder = async (): Promise<void> => {
   await client.post("/orders/generate");
+};
+
+export const createDriver = async (payload: CreateDriverPayload): Promise<void> => {
+  const body = {
+    name: payload.name,
+    licenseYear: Number(payload.licenseYear),
+    licenseCategories: Array.isArray(payload.licenseCategories) ? payload.licenseCategories : []
+  };
+  await client.post("/drivers", body, {
+    headers: { "Content-Type": "application/json" },
+    maxBodyLength: 1024
+  });
 };
 
 export const assignTrip = async (orderId: number): Promise<void> => {

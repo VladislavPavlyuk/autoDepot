@@ -1,10 +1,14 @@
 package com.example.autodepot.dto;
 
+import java.util.List;
+
 public class DriverPerformanceDTO {
     private String driverName;
     private long tripCount;
     private double totalWeight;
     private double earnings;
+    private List<String> licenseCategories;
+    private Integer experience;
 
     public String getDriverName() {
         return driverName;
@@ -36,5 +40,21 @@ public class DriverPerformanceDTO {
 
     public void setEarnings(double earnings) {
         this.earnings = earnings;
+    }
+
+    public List<String> getLicenseCategories() {
+        return licenseCategories;
+    }
+
+    public void setLicenseCategories(List<String> licenseCategories) {
+        this.licenseCategories = licenseCategories;
+    }
+
+    public Integer getExperience() {
+        return experience;
+    }
+
+    public void setExperience(Integer experience) {
+        this.experience = experience;
     }
 }

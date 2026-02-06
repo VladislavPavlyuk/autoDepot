@@ -1,6 +1,7 @@
 package com.example.autodepot.entity;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -13,8 +14,13 @@ public class Driver {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private Integer experience;
+    @Column(name = "license_year", nullable = false)
+    private Integer licenseYear;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "driver_license_categories", joinColumns = @JoinColumn(name = "driver_id"))
+    @Column(name = "category", length = 2)
+    private List<String> licenseCategories = new ArrayList<>();
 
     @Column(nullable = false)
     private boolean isAvailable = true;
@@ -28,9 +34,10 @@ public class Driver {
     public Driver() {
     }
 
-    public Driver(String name, Integer experience) {
+    public Driver(String name, Integer licenseYear) {
         this.name = name;
-        this.experience = experience;
+        this.licenseYear = licenseYear;
+        this.licenseCategories.add("B");
     }
 
     public Long getId() {
@@ -49,12 +56,28 @@ public class Driver {
         this.name = name;
     }
 
-    public Integer getExperience() {
-        return experience;
+    public Integer getLicenseYear() {
+        return licenseYear;
     }
 
-    public void setExperience(Integer experience) {
-        this.experience = experience;
+    public void setLicenseYear(Integer licenseYear) {
+        this.licenseYear = licenseYear;
+    }
+
+    public Integer getExperience() {
+        if (licenseYear == null) {
+            return 0;
+        }
+        int currentYear = java.time.Year.now().getValue();
+        return Math.max(0, currentYear - licenseYear);
+    }
+
+    public List<String> getLicenseCategories() {
+        return licenseCategories != null ? licenseCategories : new ArrayList<>();
+    }
+
+    public void setLicenseCategories(List<String> licenseCategories) {
+        this.licenseCategories = licenseCategories != null ? new ArrayList<>(licenseCategories) : new ArrayList<>();
     }
 
     public boolean isAvailable() {

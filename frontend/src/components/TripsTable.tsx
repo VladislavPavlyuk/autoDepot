@@ -1,21 +1,55 @@
 import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 import Swal from "sweetalert2";
 import { completeTrip, reportBreakdown, requestRepair } from "../api/dashboardApi";
-import { TripRow } from "../types/dashboard";
+import { TripRow, TripStatus } from "../types/dashboard";
+import { useI18n } from "../i18n";
 
 type TripsTableProps = {
   trips: TripRow[];
   onSuccess?: () => void;
 };
 
+const statusClass = (status: TripRow["status"]) => {
+  switch (status) {
+    case "IN_PROGRESS":
+      return "in-progress";
+    case "BROKEN":
+      return "broken";
+    case "REPAIR_REQUESTED":
+      return "repair-requested";
+    case "COMPLETED":
+      return "completed";
+    default:
+      return "in-progress";
+  }
+};
+
+const statusLabelKey = (status: TripRow["status"]) => {
+  switch (status) {
+    case "IN_PROGRESS":
+      return "status.inProgress";
+    case "BROKEN":
+      return "status.broken";
+    case "REPAIR_REQUESTED":
+      return "status.repairRequested";
+    case "COMPLETED":
+      return "status.completed";
+    default:
+      return "status.inProgress";
+  }
+};
+
 const TripsTable = ({ trips, onSuccess }: TripsTableProps) => {
+  const { t } = useI18n();
+  const [statusFilter, setStatusFilter] = useState<"ALL" | TripStatus>("ALL");
   const completeMutation = useMutation({
     mutationFn: completeTrip,
     onSuccess: async () => {
       await Swal.fire({
         icon: "success",
-        title: "Trip completed",
-        text: "Driver earnings and car status were updated.",
+        title: t("dialog.tripComplete.title"),
+        text: t("dialog.tripComplete.text"),
         timer: 1600,
         showConfirmButton: false
       });
@@ -24,8 +58,8 @@ const TripsTable = ({ trips, onSuccess }: TripsTableProps) => {
     onError: async (error) => {
       await Swal.fire({
         icon: "error",
-        title: "Completion failed",
-        text: error instanceof Error ? error.message : "Unable to complete trip right now."
+        title: t("dialog.tripCompleteFail.title"),
+        text: error instanceof Error ? error.message : t("dialog.tripCompleteFail.text")
       });
     }
   });
@@ -35,8 +69,8 @@ const TripsTable = ({ trips, onSuccess }: TripsTableProps) => {
     onSuccess: async () => {
       await Swal.fire({
         icon: "success",
-        title: "Breakdown reported",
-        text: "Trip status updated to broken.",
+        title: t("dialog.breakdown.title"),
+        text: t("dialog.breakdown.text"),
         timer: 1600,
         showConfirmButton: false
       });
@@ -45,8 +79,8 @@ const TripsTable = ({ trips, onSuccess }: TripsTableProps) => {
     onError: async (error) => {
       await Swal.fire({
         icon: "error",
-        title: "Breakdown failed",
-        text: error instanceof Error ? error.message : "Unable to report breakdown."
+        title: t("dialog.breakdownFail.title"),
+        text: error instanceof Error ? error.message : t("dialog.breakdownFail.text")
       });
     }
   });
@@ -56,8 +90,8 @@ const TripsTable = ({ trips, onSuccess }: TripsTableProps) => {
     onSuccess: async () => {
       await Swal.fire({
         icon: "success",
-        title: "Repair requested",
-        text: "The trip is now awaiting repairs.",
+        title: t("dialog.repair.title"),
+        text: t("dialog.repair.text"),
         timer: 1600,
         showConfirmButton: false
       });
@@ -66,8 +100,8 @@ const TripsTable = ({ trips, onSuccess }: TripsTableProps) => {
     onError: async (error) => {
       await Swal.fire({
         icon: "error",
-        title: "Repair failed",
-        text: error instanceof Error ? error.message : "Unable to request repair."
+        title: t("dialog.repairFail.title"),
+        text: error instanceof Error ? error.message : t("dialog.repairFail.text")
       });
     }
   });
@@ -76,17 +110,17 @@ const TripsTable = ({ trips, onSuccess }: TripsTableProps) => {
     if (!trip.tripId) {
       await Swal.fire({
         icon: "warning",
-        title: "Missing trip id",
-        text: "Reload the dashboard before completing this trip."
+        title: t("dialog.tripIdMissing.title"),
+        text: t("dialog.tripIdMissing.complete")
       });
       return;
     }
     const result = await Swal.fire({
-      title: "Car status after trip",
+      title: t("dialog.carStatus.title"),
       input: "select",
       inputOptions: {
-        OK: "OK",
-        BROKEN: "BROKEN"
+        OK: t("dialog.carStatus.ok"),
+        BROKEN: t("dialog.carStatus.broken")
       },
       inputValue: "OK",
       showCancelButton: true
@@ -101,8 +135,8 @@ const TripsTable = ({ trips, onSuccess }: TripsTableProps) => {
     if (!trip.tripId) {
       await Swal.fire({
         icon: "warning",
-        title: "Missing trip id",
-        text: "Reload the dashboard before reporting a breakdown."
+        title: t("dialog.tripIdMissing.title"),
+        text: t("dialog.tripIdMissing.breakdown")
       });
       return;
     }
@@ -113,52 +147,65 @@ const TripsTable = ({ trips, onSuccess }: TripsTableProps) => {
     if (!trip.tripId) {
       await Swal.fire({
         icon: "warning",
-        title: "Missing trip id",
-        text: "Reload the dashboard before requesting repair."
+        title: t("dialog.tripIdMissing.title"),
+        text: t("dialog.tripIdMissing.repair")
       });
       return;
     }
     repairMutation.mutate(trip.tripId);
   };
 
+  const visibleTrips =
+    statusFilter === "ALL" ? trips : trips.filter((trip) => trip.status === statusFilter);
+
   return (
     <div className="card">
       <div className="card-header">
-        <h2>Recent trips</h2>
-        <button className="button ghost">Manage</button>
+        <h2>{t("trips.title")}</h2>
+        <div className="header-actions">
+          <select
+            className="filter-select"
+            value={statusFilter}
+            onChange={(event) => setStatusFilter(event.target.value as "ALL" | TripStatus)}
+          >
+            <option value="ALL">{t("filter.all")}</option>
+            <option value="IN_PROGRESS">{t("status.inProgress")}</option>
+            <option value="BROKEN">{t("status.broken")}</option>
+            <option value="REPAIR_REQUESTED">{t("status.repairRequested")}</option>
+            <option value="COMPLETED">{t("status.completed")}</option>
+          </select>
+        </div>
       </div>
       <div className="table">
         <div className="table-row head">
-          <span>Trip</span>
-          <span>Driver</span>
-          <span>Car</span>
-          <span>Status</span>
-          <span>Payment</span>
+          <span>{t("trips.col.id")}</span>
+          <span>{t("trips.col.driver")}</span>
+          <span>{t("trips.col.car")}</span>
+          <span>{t("trips.col.status")}</span>
+          <span>{t("trips.col.payment")}</span>
         </div>
-        {trips.map((trip) => (
+        {visibleTrips.map((trip) => (
           <div key={trip.id} className="table-row">
             <span>{trip.id}</span>
             <span>{trip.driver}</span>
             <span>{trip.car}</span>
-            <span className={`chip ${trip.status.toLowerCase().replace(" ", "-")}`}>
-              {trip.status}
-            </span>
+            <span className={`chip ${statusClass(trip.status)}`}>{t(statusLabelKey(trip.status))}</span>
             <div className="payment-cell">
               <span>{trip.payment}</span>
               <div className="table-actions">
-                {trip.status === "In progress" && (
+                {trip.status === "IN_PROGRESS" && (
                   <>
                     <button className="button ghost tiny" onClick={() => handleComplete(trip)}>
-                      Complete
+                      {t("trips.complete")}
                     </button>
                     <button className="button ghost tiny" onClick={() => handleBreakdown(trip)}>
-                      Breakdown
+                      {t("trips.breakdown")}
                     </button>
                   </>
                 )}
-                {trip.status === "Broken" && (
+                {trip.status === "BROKEN" && (
                   <button className="button ghost tiny" onClick={() => handleRepair(trip)}>
-                    Repair
+                    {t("trips.repair")}
                   </button>
                 )}
               </div>

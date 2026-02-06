@@ -9,6 +9,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -56,11 +57,22 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         if (driverService.count() == 0) {
-            driverService.save(new Driver("John Smith", 12));
-            driverService.save(new Driver("Michael Johnson", 8));
-            driverService.save(new Driver("David Williams", 15));
-            driverService.save(new Driver("Robert Brown", 3));
-            driverService.save(new Driver("James Davis", 6));
+            int currentYear = java.time.Year.now().getValue();
+            Driver john = new Driver("John Smith", currentYear - 12);
+            john.setLicenseCategories(List.of("B", "C"));
+            driverService.save(john);
+            Driver michael = new Driver("Michael Johnson", currentYear - 8);
+            michael.setLicenseCategories(List.of("B"));
+            driverService.save(michael);
+            Driver david = new Driver("David Williams", currentYear - 15);
+            david.setLicenseCategories(List.of("B", "D"));
+            driverService.save(david);
+            Driver robert = new Driver("Robert Brown", currentYear - 3);
+            robert.setLicenseCategories(List.of("B"));
+            driverService.save(robert);
+            Driver james = new Driver("James Davis", currentYear - 6);
+            james.setLicenseCategories(List.of("B", "C"));
+            driverService.save(james);
         }
 
         if (carService.count() == 0) {

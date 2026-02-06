@@ -4,21 +4,34 @@ export type StatCard = {
   trend: string;
 };
 
+export type DriverStat = {
+  driverName: string;
+  tripCount: number;
+  totalWeight: number;
+  earnings: number;
+  licenseCategories: string[];
+  experience: number;
+};
+
+export type OrderStatus = "QUEUED" | "ASSIGNED" | "READY";
+
 export type OrderRow = {
   id: string;
   orderId?: number;
   cargo: string;
   destination: string;
   weight: string;
-  status: "Queued" | "Assigned" | "Ready";
+  status: OrderStatus;
 };
+
+export type TripStatus = "IN_PROGRESS" | "BROKEN" | "REPAIR_REQUESTED" | "COMPLETED";
 
 export type TripRow = {
   id: string;
   tripId?: number;
   driver: string;
   car: string;
-  status: "Completed" | "Repair Requested" | "In progress" | "Broken";
+  status: TripStatus;
   payment: string;
 };
 
@@ -27,4 +40,5 @@ export type DashboardData = {
   orders: OrderRow[];
   trips: TripRow[];
   activity: string[];
+  driverPerformance?: DriverStat[];
 };

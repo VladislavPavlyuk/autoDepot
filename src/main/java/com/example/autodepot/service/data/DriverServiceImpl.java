@@ -3,6 +3,7 @@ package com.example.autodepot.service.data;
 import com.example.autodepot.entity.Driver;
 import com.example.autodepot.repository.DriverRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -30,7 +31,9 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
+    @Transactional
     public Driver save(Driver driver) {
-        return driverRepository.save(driver);
+        Driver saved = driverRepository.saveAndFlush(driver);
+        return saved;
     }
 }

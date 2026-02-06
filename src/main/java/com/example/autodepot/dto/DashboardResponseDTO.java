@@ -7,6 +7,7 @@ public class DashboardResponseDTO {
     private List<DashboardOrderDTO> orders;
     private List<DashboardTripDTO> trips;
     private List<String> activity;
+    private List<DriverPerformanceDTO> driverPerformance;
 
     public List<DashboardStatDTO> getStats() {
         return stats;
@@ -38,5 +39,13 @@ public class DashboardResponseDTO {
 
     public void setActivity(List<String> activity) {
         this.activity = activity;
+    }
+
+    public List<DriverPerformanceDTO> getDriverPerformance() {
+        return driverPerformance;
+    }
+
+    public void setDriverPerformance(List<DriverPerformanceDTO> driverPerformance) {
+        this.driverPerformance = driverPerformance;
     }
 }

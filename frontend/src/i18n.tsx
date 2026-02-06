@@ -1,0 +1,291 @@
+import { createContext, useContext, useMemo, useState } from "react";
+
+export type Language = "uk" | "en";
+
+type Dictionary = Record<string, string>;
+
+const translations: Record<Language, Dictionary> = {
+  uk: {
+    "app.name": "Автобаза",
+    "app.subtitle": "Диспетчерська",
+    "app.footer": "Автобаза · навчальний режим",
+    "search.placeholder": "Пошук за заявками, рейсами, водіями",
+    "action.newOrder": "Нова заявка",
+    "action.assignTrip": "Призначити рейс",
+    "action.generateOrder": "Згенерувати заявку",
+    "actionCenter.title": "Диспетчер",
+    "actionCenter.subtitle": "Розподіл заявок на рейси",
+    "hero.title": "Панель диспетчера",
+    "hero.subtitle": "Заявки, рейси, поломки та ремонти — все в одному місці.",
+    "orders.title": "Заявки",
+    "orders.col.id": "Заявка",
+    "orders.col.cargo": "Вантаж",
+    "orders.col.destination": "Пункт призначення",
+    "orders.col.weight": "Вага",
+    "orders.col.status": "Статус",
+    "orders.assign": "Призначити",
+    "orders.noId": "Немає ID заявки",
+    "orders.refreshHint": "Оновіть дані перед призначенням рейсу.",
+    "trips.title": "Рейси",
+    "trips.col.id": "Рейс",
+    "trips.col.driver": "Водій",
+    "trips.col.car": "Авто",
+    "trips.col.status": "Статус",
+    "trips.col.payment": "Виплата",
+    "trips.complete": "Завершити",
+    "trips.breakdown": "Позначити поломку",
+    "trips.repair": "Запросити ремонт",
+    "activity.title": "Лог поїздок",
+    "activity.subtitle": "Останні події",
+    "activity.empty": "Подій поки немає.",
+    "drivers.title": "Водії",
+    "drivers.subtitle": "Статистика по водіях",
+    "drivers.add": "Додати водія",
+    "dialog.addDriver.title": "Додавання водія",
+    "dialog.addDriver.name": "ПІБ водія",
+    "dialog.addDriver.validation": "Вкажіть ПІБ, категорію прав і рік отримання.",
+    "dialog.addDriver.success.title": "Водія додано",
+    "dialog.addDriver.success.text": "Новий водій доступний для рейсів.",
+    "dialog.addDriver.refetchFail": "Водія додано. Оновіть сторінку, щоб побачити список.",
+    "dialog.addDriver.fail.title": "Помилка",
+    "dialog.addDriver.fail.text": "Не вдалося додати водія.",
+    "drivers.col.name": "Водій",
+    "drivers.col.trips": "Рейсів",
+    "drivers.col.weight": "Вага",
+    "drivers.col.earnings": "Заробіток",
+    "drivers.col.rating": "Рейтинг",
+    "drivers.top": "Топ",
+    "drivers.empty": "Даних по водіях поки немає.",
+    "unit.kg": "кг",
+    "filter.all": "Усі",
+    "status.queued": "У черзі",
+    "status.assigned": "Призначена",
+    "status.ready": "Готова",
+    "status.inProgress": "В дорозі",
+    "status.broken": "Зламаний",
+    "status.repairRequested": "Ремонт запитано",
+    "status.completed": "Завершено",
+    "dialog.newOrder.title": "Нова заявка",
+    "dialog.newOrder.destination": "Пункт призначення",
+    "dialog.newOrder.cargo": "Тип вантажу",
+    "dialog.newOrder.weight": "Вага (кг)",
+    "dialog.newOrder.selectDestination": "Обрати пункт призначення",
+    "dialog.newOrder.selectCargo": "Обрати тип вантажу",
+    "dialog.newOrder.customValue": "Інше...",
+    "dialog.newOrder.customDestination": "Інший пункт призначення",
+    "dialog.newOrder.customCargo": "Інший тип вантажу",
+    "dialog.newOrder.validation": "Вкажіть пункт, тип вантажу та коректну вагу.",
+    "dialog.orderCreated.title": "Заявку створено",
+    "dialog.orderCreated.text": "Заявку додано в чергу на призначення.",
+    "dialog.assignSuccess.title": "Рейс призначено",
+    "dialog.assignSuccess.text": "Водія та авто призначено автоматично.",
+    "dialog.assignFail.title": "Не вдалося призначити",
+    "dialog.assignFail.text": "Неможливо призначити рейс зараз.",
+    "dialog.generateFail.title": "Не вдалося створити",
+    "dialog.generateFail.text": "Неможливо створити заявку.",
+    "dialog.noOrders.title": "Немає заявок",
+    "dialog.noOrders.text": "Створіть заявку перед призначенням рейсу.",
+    "dialog.tripComplete.title": "Рейс завершено",
+    "dialog.tripComplete.text": "Водій та авто звільнені.",
+    "dialog.tripCompleteFail.title": "Не вдалося завершити",
+    "dialog.tripCompleteFail.text": "Неможливо завершити рейс зараз.",
+    "dialog.breakdown.title": "Поломку зафіксовано",
+    "dialog.breakdown.text": "Статус рейсу змінено на поломку.",
+    "dialog.breakdownFail.title": "Не вдалося позначити поломку",
+    "dialog.breakdownFail.text": "Неможливо позначити поломку.",
+    "dialog.repair.title": "Ремонт запитано",
+    "dialog.repair.text": "Рейс переведено в очікування ремонту.",
+    "dialog.repairFail.title": "Не вдалося запросити ремонт",
+    "dialog.repairFail.text": "Неможливо запросити ремонт.",
+    "dialog.tripIdMissing.title": "Немає ID рейсу",
+    "dialog.tripIdMissing.complete": "Оновіть дані перед завершенням рейсу.",
+    "dialog.tripIdMissing.breakdown": "Оновіть дані перед відміткою поломки.",
+    "dialog.tripIdMissing.repair": "Оновіть дані перед запитом ремонту.",
+    "dialog.carStatus.title": "Стан автомобіля",
+    "dialog.carStatus.ok": "Справний",
+    "dialog.carStatus.broken": "Зламаний",
+    "stat.activeTrips": "Рейси в дорозі",
+    "stat.pendingOrders": "Заявки в черзі",
+    "stat.topDriver": "Найкращий водій",
+    "stat.destinations": "Пунктів призначення",
+    "language.uk": "Українська",
+    "language.en": "English",
+    "theme.light": "Світла тема",
+    "theme.dark": "Темна тема",
+    "dialog.addDriver.licenseCategory": "Категорія прав",
+    "dialog.addDriver.licenseYear": "Рік отримання прав",
+    "dialog.addDriver.selectYear": "Обрати рік",
+    "license.category.A": "A",
+    "license.category.B": "B",
+    "license.category.C": "C",
+    "license.category.D": "D",
+    "license.category.E": "E",
+    "drivers.col.category": "Категорія",
+    "drivers.col.experience": "Стаж"
+  },
+  en: {
+    "app.name": "AutoDepot",
+    "app.subtitle": "Dispatch",
+    "app.footer": "AutoDepot · training mode",
+    "search.placeholder": "Search orders, trips, drivers",
+    "action.newOrder": "New order",
+    "action.assignTrip": "Assign trip",
+    "action.generateOrder": "Generate order",
+    "actionCenter.title": "Dispatcher",
+    "actionCenter.subtitle": "Order-to-trip allocation",
+    "hero.title": "Dispatcher dashboard",
+    "hero.subtitle": "Orders, trips, breakdowns, and repairs in one place.",
+    "orders.title": "Orders",
+    "orders.col.id": "Order",
+    "orders.col.cargo": "Cargo",
+    "orders.col.destination": "Destination",
+    "orders.col.weight": "Weight",
+    "orders.col.status": "Status",
+    "orders.assign": "Assign",
+    "orders.noId": "Missing order ID",
+    "orders.refreshHint": "Refresh data before assigning a trip.",
+    "trips.title": "Trips",
+    "trips.col.id": "Trip",
+    "trips.col.driver": "Driver",
+    "trips.col.car": "Car",
+    "trips.col.status": "Status",
+    "trips.col.payment": "Payment",
+    "trips.complete": "Complete",
+    "trips.breakdown": "Report breakdown",
+    "trips.repair": "Request repair",
+    "activity.title": "Trip log",
+    "activity.subtitle": "Latest events",
+    "activity.empty": "No events yet.",
+    "drivers.title": "Drivers",
+    "drivers.subtitle": "Driver statistics",
+    "drivers.add": "Add driver",
+    "dialog.addDriver.title": "Add driver",
+    "dialog.addDriver.name": "Driver name",
+    "dialog.addDriver.validation": "Enter a name, license category, and license year.",
+    "dialog.addDriver.success.title": "Driver added",
+    "dialog.addDriver.success.text": "New driver is now available for trips.",
+    "dialog.addDriver.refetchFail": "Driver added. Refresh the page to see the list.",
+    "dialog.addDriver.fail.title": "Error",
+    "dialog.addDriver.fail.text": "Failed to add driver.",
+    "drivers.col.name": "Driver",
+    "drivers.col.trips": "Trips",
+    "drivers.col.weight": "Weight",
+    "drivers.col.earnings": "Earnings",
+    "drivers.col.rating": "Rank",
+    "drivers.top": "Top",
+    "drivers.empty": "No driver stats yet.",
+    "unit.kg": "kg",
+    "filter.all": "All",
+    "status.queued": "Queued",
+    "status.assigned": "Assigned",
+    "status.ready": "Ready",
+    "status.inProgress": "In progress",
+    "status.broken": "Broken",
+    "status.repairRequested": "Repair requested",
+    "status.completed": "Completed",
+    "dialog.newOrder.title": "New order",
+    "dialog.newOrder.destination": "Destination",
+    "dialog.newOrder.cargo": "Cargo type",
+    "dialog.newOrder.weight": "Weight (kg)",
+    "dialog.newOrder.selectDestination": "Select destination",
+    "dialog.newOrder.selectCargo": "Select cargo type",
+    "dialog.newOrder.customValue": "Other...",
+    "dialog.newOrder.customDestination": "Other destination",
+    "dialog.newOrder.customCargo": "Other cargo type",
+    "dialog.newOrder.validation": "Enter destination, cargo type, and a valid weight.",
+    "dialog.orderCreated.title": "Order created",
+    "dialog.orderCreated.text": "The order was added to the dispatch queue.",
+    "dialog.assignSuccess.title": "Trip assigned",
+    "dialog.assignSuccess.text": "Driver and vehicle were assigned automatically.",
+    "dialog.assignFail.title": "Assignment failed",
+    "dialog.assignFail.text": "Unable to assign trip right now.",
+    "dialog.generateFail.title": "Generation failed",
+    "dialog.generateFail.text": "Unable to generate an order.",
+    "dialog.noOrders.title": "No orders",
+    "dialog.noOrders.text": "Create an order before assigning a trip.",
+    "dialog.tripComplete.title": "Trip completed",
+    "dialog.tripComplete.text": "Driver and vehicle are now available.",
+    "dialog.tripCompleteFail.title": "Completion failed",
+    "dialog.tripCompleteFail.text": "Unable to complete trip right now.",
+    "dialog.breakdown.title": "Breakdown recorded",
+    "dialog.breakdown.text": "Trip status updated to broken.",
+    "dialog.breakdownFail.title": "Breakdown failed",
+    "dialog.breakdownFail.text": "Unable to report breakdown.",
+    "dialog.repair.title": "Repair requested",
+    "dialog.repair.text": "Trip moved to repair queue.",
+    "dialog.repairFail.title": "Repair failed",
+    "dialog.repairFail.text": "Unable to request repair.",
+    "dialog.tripIdMissing.title": "Missing trip ID",
+    "dialog.tripIdMissing.complete": "Refresh data before completing this trip.",
+    "dialog.tripIdMissing.breakdown": "Refresh data before reporting a breakdown.",
+    "dialog.tripIdMissing.repair": "Refresh data before requesting repair.",
+    "dialog.carStatus.title": "Vehicle condition",
+    "dialog.carStatus.ok": "OK",
+    "dialog.carStatus.broken": "Broken",
+    "stat.activeTrips": "Trips in progress",
+    "stat.pendingOrders": "Queued orders",
+    "stat.topDriver": "Top driver",
+    "stat.destinations": "Destinations",
+    "language.uk": "Українська",
+    "language.en": "English",
+    "theme.light": "Light theme",
+    "theme.dark": "Dark theme",
+    "dialog.addDriver.licenseCategory": "License category",
+    "dialog.addDriver.licenseYear": "License year",
+    "dialog.addDriver.selectYear": "Select year",
+    "license.category.A": "A",
+    "license.category.B": "B",
+    "license.category.C": "C",
+    "license.category.D": "D",
+    "license.category.E": "E",
+    "drivers.col.category": "Category",
+    "drivers.col.experience": "Experience"
+  }
+};
+
+const STORAGE_KEY = "autodepot.language";
+
+const getInitialLanguage = (): Language => {
+  if (typeof window === "undefined") return "en";
+  const saved = window.localStorage.getItem(STORAGE_KEY) as Language | null;
+  if (saved === "uk" || saved === "en") return saved;
+  const browser = window.navigator.language.toLowerCase();
+  if (browser.startsWith("uk")) return "uk";
+  return "en";
+};
+
+type I18nContextValue = {
+  language: Language;
+  setLanguage: (language: Language) => void;
+  t: (key: string) => string;
+};
+
+const I18nContext = createContext<I18nContextValue | undefined>(undefined);
+
+export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
+  const [language, setLanguageState] = useState<Language>(getInitialLanguage);
+
+  const setLanguage = (next: Language) => {
+    setLanguageState(next);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(STORAGE_KEY, next);
+    }
+  };
+
+  const t = useMemo(
+    () => (key: string) => translations[language][key] ?? translations.en[key] ?? key,
+    [language]
+  );
+
+  const value = useMemo(() => ({ language, setLanguage, t }), [language, t]);
+
+  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
+};
+
+export const useI18n = () => {
+  const ctx = useContext(I18nContext);
+  if (!ctx) {
+    throw new Error("useI18n must be used within I18nProvider");
+  }
+  return ctx;
+};

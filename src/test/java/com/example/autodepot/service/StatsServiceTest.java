@@ -48,16 +48,16 @@ class StatsServiceTest {
 
     @BeforeEach
     void setUp() {
-        driver1 = new Driver("John Smith", 5);
+        driver1 = new Driver("Ivan Petrenko", 5);
         driver1.setId(1L);
         driver1.setEarnings(500.0);
 
-        driver2 = new Driver("Michael Johnson", 8);
+        driver2 = new Driver("Mykhailo Kovalenko", 8);
         driver2.setId(2L);
         driver2.setEarnings(750.0);
 
-        Order order1 = new Order("New York", "STANDARD", 1000.0);
-        Order order2 = new Order("Los Angeles", "FRAGILE", 2000.0);
+        Order order1 = new Order("Berlin", "STANDARD", 1000.0);
+        Order order2 = new Order("Paris", "FRAGILE", 2000.0);
 
         completedTrip1 = new Trip(order1, driver1, new Car(2000.0));
         completedTrip1.setId(1L);
@@ -82,14 +82,14 @@ class StatsServiceTest {
 
     @Test
     void getDriverPerformance_WhenStatsAvailable_ReturnsExpectedDriverStats() {
-        Object[] stat1 = new Object[]{"John Smith", 5L, 5000.0};
-        Object[] stat2 = new Object[]{"Michael Johnson", 3L, 6000.0};
+        Object[] stat1 = new Object[]{"Ivan Petrenko", 5L, 5000.0};
+        Object[] stat2 = new Object[]{"Mykhailo Kovalenko", 3L, 6000.0};
         when(tripDataService.findStatsByDriver()).thenReturn(Arrays.asList(stat1, stat2));
 
         List<DriverPerformanceDTO> performance = statsService.getDriverPerformance();
 
         DriverPerformanceDTO johnStats = performance.stream()
-            .filter(dto -> "John Smith".equals(dto.getDriverName()))
+            .filter(dto -> "Ivan Petrenko".equals(dto.getDriverName()))
             .findFirst()
             .orElse(null);
         boolean actualResult = performance.size() == 2
@@ -107,7 +107,7 @@ class StatsServiceTest {
         List<CargoByDestinationDTO> cargoByDestination = statsService.getCargoByDestination();
 
         CargoByDestinationDTO la = cargoByDestination.stream()
-            .filter(dto -> "Los Angeles".equals(dto.getDestination()))
+            .filter(dto -> "Paris".equals(dto.getDestination()))
             .findFirst()
             .orElse(null);
         boolean actualResult = cargoByDestination.size() == 2
@@ -124,7 +124,7 @@ class StatsServiceTest {
         List<DriverEarningsDTO> earnings = statsService.getDriverEarnings();
 
         DriverEarningsDTO john = earnings.stream()
-            .filter(dto -> "John Smith".equals(dto.getDriverName()))
+            .filter(dto -> "Ivan Petrenko".equals(dto.getDriverName()))
             .findFirst()
             .orElse(null);
         boolean actualResult = earnings.size() == 2
@@ -139,7 +139,7 @@ class StatsServiceTest {
         when(driverService.findAll()).thenReturn(Arrays.asList(driver1, driver2));
 
         String actualResult = statsService.getMostProfitable();
-        String expectedResult = "Michael Johnson ($750.00)";
+        String expectedResult = "Mykhailo Kovalenko (€750.00)";
 
         assertEquals(expectedResult, actualResult);
     }
@@ -156,7 +156,7 @@ class StatsServiceTest {
 
     @Test
     void getAllStats_WhenDataAvailable_ReturnsAllStatSections() {
-        Object[] stat = new Object[]{"John Smith", 5L, 5000.0};
+        Object[] stat = new Object[]{"Ivan Petrenko", 5L, 5000.0};
         List<Object[]> statsList = new ArrayList<>();
         statsList.add(stat);
         when(tripDataService.findStatsByDriver()).thenReturn(statsList);

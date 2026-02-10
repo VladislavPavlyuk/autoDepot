@@ -2,6 +2,7 @@ package com.example.autodepot.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -32,12 +33,14 @@ public class Order {
     }
 
     public Order() {
+        this.trips = new ArrayList<>();
     }
 
     public Order(String destination, String cargoType, double weight) {
         this.destination = destination;
         this.cargoType = cargoType;
         this.weight = weight;
+        this.trips = new ArrayList<>();
     }
 
     public Long getId() {

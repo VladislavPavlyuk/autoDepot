@@ -39,9 +39,9 @@ class TripRepositoryTest extends AbstractPostgresTest {
 
     @Test
     void saveAndFindTrip_WhenTripSaved_ReturnsMatchingTrip() {
-        Driver driver = driverRepository.save(new Driver("John Smith", 5));
+        Driver driver = driverRepository.save(new Driver("Ivan Petrenko", 5));
         Car car = carRepository.save(new Car(2000.0));
-        Order order = orderRepository.save(new Order("New York", "STANDARD", 1000.0));
+        Order order = orderRepository.save(new Order("Berlin", "STANDARD", 1000.0));
 
         Trip trip = new Trip(order, driver, car);
         trip.setStatus(Trip.TripStatus.IN_PROGRESS);
@@ -58,9 +58,9 @@ class TripRepositoryTest extends AbstractPostgresTest {
 
     @Test
     void existsByOrderId_WhenOrderLinkedToTrip_ReturnsTrue() {
-        Driver driver = driverRepository.save(new Driver("John Smith", 5));
+        Driver driver = driverRepository.save(new Driver("Ivan Petrenko", 5));
         Car car = carRepository.save(new Car(2000.0));
-        Order order = orderRepository.save(new Order("New York", "STANDARD", 1000.0));
+        Order order = orderRepository.save(new Order("Berlin", "STANDARD", 1000.0));
 
         Trip trip = new Trip(order, driver, car);
         trip.setStatus(Trip.TripStatus.IN_PROGRESS);
@@ -74,10 +74,10 @@ class TripRepositoryTest extends AbstractPostgresTest {
 
     @Test
     void findStatsByDriver_WhenTripsExist_ReturnsDriverTripCount() {
-        Driver driver = driverRepository.save(new Driver("John Smith", 5));
+        Driver driver = driverRepository.save(new Driver("Ivan Petrenko", 5));
         Car car = carRepository.save(new Car(2000.0));
-        Order order1 = orderRepository.save(new Order("New York", "STANDARD", 1000.0));
-        Order order2 = orderRepository.save(new Order("Chicago", "STANDARD", 2000.0));
+        Order order1 = orderRepository.save(new Order("Berlin", "STANDARD", 1000.0));
+        Order order2 = orderRepository.save(new Order("Madrid", "STANDARD", 2000.0));
 
         Trip trip1 = new Trip(order1, driver, car);
         trip1.setStatus(Trip.TripStatus.COMPLETED);
@@ -95,10 +95,10 @@ class TripRepositoryTest extends AbstractPostgresTest {
 
     @Test
     void findStatsByDriver_WhenTripsExist_ReturnsDriverName() {
-        Driver driver = driverRepository.save(new Driver("John Smith", 5));
+        Driver driver = driverRepository.save(new Driver("Ivan Petrenko", 5));
         Car car = carRepository.save(new Car(2000.0));
-        Order order1 = orderRepository.save(new Order("New York", "STANDARD", 1000.0));
-        Order order2 = orderRepository.save(new Order("Chicago", "STANDARD", 2000.0));
+        Order order1 = orderRepository.save(new Order("Berlin", "STANDARD", 1000.0));
+        Order order2 = orderRepository.save(new Order("Madrid", "STANDARD", 2000.0));
 
         Trip trip1 = new Trip(order1, driver, car);
         trip1.setStatus(Trip.TripStatus.COMPLETED);
@@ -110,16 +110,16 @@ class TripRepositoryTest extends AbstractPostgresTest {
 
         List<Object[]> stats = tripRepository.findStatsByDriver();
         String actualResult = stats == null ? null : (String) stats.get(0)[0];
-        String expectedResult = "John Smith";
+        String expectedResult = "Ivan Petrenko";
         assertEquals(expectedResult, actualResult);
     }
 
     @Test
     void findStatsByDriver_WhenTripsExist_ReturnsDriverTotalWeight() {
-        Driver driver = driverRepository.save(new Driver("John Smith", 5));
+        Driver driver = driverRepository.save(new Driver("Ivan Petrenko", 5));
         Car car = carRepository.save(new Car(2000.0));
-        Order order1 = orderRepository.save(new Order("New York", "STANDARD", 1000.0));
-        Order order2 = orderRepository.save(new Order("Chicago", "STANDARD", 2000.0));
+        Order order1 = orderRepository.save(new Order("Berlin", "STANDARD", 1000.0));
+        Order order2 = orderRepository.save(new Order("Madrid", "STANDARD", 2000.0));
 
         Trip trip1 = new Trip(order1, driver, car);
         trip1.setStatus(Trip.TripStatus.COMPLETED);

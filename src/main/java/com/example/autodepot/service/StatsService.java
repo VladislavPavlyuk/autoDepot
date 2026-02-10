@@ -64,10 +64,17 @@ public class StatsService {
     private <T> T getStat(StatsKey key, Class<T> type) {
         StatsAggregator aggregator = statsKeyRegistry.get(key);
         Object value = aggregator.aggregate();
+        if (value == null) {
+            if (type == String.class) {
+                return type.cast("");
+            }
+            if (Map.class.isAssignableFrom(type)) {
+                return type.cast(java.util.Collections.emptyMap());
+            }
+        }
         if (!type.isInstance(value)) {
             throw new IllegalStateException("Stats type mismatch for key: " + key);
         }
-
         return type.cast(value);
     }
 

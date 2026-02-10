@@ -3,6 +3,7 @@ import { useI18n } from "../i18n";
 type TopBarProps = {
   onSearch: (value: string) => void;
   onCreateOrder: () => void;
+  onOpenErrors?: () => void;
   currentTime: string;
   language: "uk" | "en";
   onLanguageChange: (language: "uk" | "en") => void;
@@ -13,6 +14,7 @@ type TopBarProps = {
 const TopBar = ({
   onSearch,
   onCreateOrder,
+  onOpenErrors,
   currentTime,
   language,
   onLanguageChange,
@@ -37,6 +39,11 @@ const TopBar = ({
           placeholder={t("search.placeholder")}
           onChange={(event) => onSearch(event.target.value)}
         />
+        {onOpenErrors != null && (
+          <button type="button" className="button ghost" onClick={onOpenErrors}>
+            Errors
+          </button>
+        )}
         <select
           className="filter-select"
           value={language}

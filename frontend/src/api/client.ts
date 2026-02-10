@@ -2,19 +2,30 @@ import axios from "axios";
 
 const client = axios.create({
   baseURL: "/api",
-  timeout: 5000
+  timeout: 15_000
 });
+
+function getMessageFromResponse(data: unknown): string | null {
+  if (data == null) return null;
+  if (typeof data === "object" && "message" in data) {
+    return String((data as { message: unknown }).message);
+  }
+  if (typeof data === "string") {
+    try {
+      const parsed = JSON.parse(data) as { message?: unknown };
+      if (parsed && typeof parsed.message === "string") return parsed.message;
+    } catch {
+      // ignore
+    }
+    return data;
+  }
+  return null;
+}
 
 client.interceptors.response.use(
   (r) => r,
   (err) => {
-    const data = err.response?.data;
-    const msg =
-      data != null && typeof data === "object" && "message" in data
-        ? String((data as { message: unknown }).message)
-        : typeof data === "string"
-          ? data
-          : err.message;
+    const msg = getMessageFromResponse(err.response?.data) ?? err.message;
     (err as Error & { serverMessage?: string }).serverMessage = msg;
     return Promise.reject(err);
   }

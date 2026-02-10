@@ -28,9 +28,17 @@ const normalizeDashboard = (data?: Partial<DashboardData> | null): DashboardData
   };
 };
 
+function isDashboardResponse(value: unknown): value is Record<string, unknown> {
+  return value != null && typeof value === "object" && !Array.isArray(value);
+}
+
 export const fetchDashboard = async (): Promise<DashboardData> => {
   const response = await client.get<DashboardData>("/dashboard");
-  return normalizeDashboard(response.data);
+  const raw = response.data;
+  if (!isDashboardResponse(raw)) {
+    throw new Error("Invalid dashboard response");
+  }
+  return normalizeDashboard(raw);
 };
 
 export const createOrder = async (payload: CreateOrderPayload): Promise<void> => {

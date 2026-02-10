@@ -5,6 +5,7 @@ import com.example.autodepot.service.generation.OrderGenerator;
 import com.example.autodepot.service.data.OrderService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class OrderGenerationService {
@@ -29,6 +30,7 @@ public class OrderGenerationService {
         }
     }
 
+    @Transactional
     public void generateRandomOrder() {
         orderService.save(orderGenerator.generate());
     }

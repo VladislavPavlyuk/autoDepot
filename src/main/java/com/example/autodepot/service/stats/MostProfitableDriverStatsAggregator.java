@@ -32,7 +32,7 @@ public class MostProfitableDriverStatsAggregator implements StatsAggregator {
             .max(Comparator.comparing(Driver::getEarnings));
 
         return mostProfitable
-            .map(d -> d.getName() + " ($" + String.format("%.2f", d.getEarnings()) + ")")
+            .map(d -> d.getName() + " (€" + String.format("%.2f", d.getEarnings()) + ")")
             .orElse("No data available");
     }
 }

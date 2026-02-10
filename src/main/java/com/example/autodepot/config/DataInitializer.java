@@ -58,21 +58,21 @@ public class DataInitializer implements CommandLineRunner {
 
         if (driverService.count() == 0) {
             int currentYear = java.time.Year.now().getValue();
-            Driver john = new Driver("John Smith", currentYear - 12);
-            john.setLicenseCategories(List.of("B", "C"));
-            driverService.save(john);
-            Driver michael = new Driver("Michael Johnson", currentYear - 8);
-            michael.setLicenseCategories(List.of("B"));
-            driverService.save(michael);
-            Driver david = new Driver("David Williams", currentYear - 15);
-            david.setLicenseCategories(List.of("B", "D"));
-            driverService.save(david);
-            Driver robert = new Driver("Robert Brown", currentYear - 3);
-            robert.setLicenseCategories(List.of("B"));
-            driverService.save(robert);
-            Driver james = new Driver("James Davis", currentYear - 6);
-            james.setLicenseCategories(List.of("B", "C"));
-            driverService.save(james);
+            Driver d1 = new Driver("Ivan Petrenko", currentYear - 12);
+            d1.setLicenseCategories(List.of("B", "C"));
+            driverService.save(d1);
+            Driver d2 = new Driver("Mykhailo Kovalenko", currentYear - 8);
+            d2.setLicenseCategories(List.of("B"));
+            driverService.save(d2);
+            Driver d3 = new Driver("Oleksandr Shevchenko", currentYear - 15);
+            d3.setLicenseCategories(List.of("B", "D"));
+            driverService.save(d3);
+            Driver d4 = new Driver("Andrii Melnyk", currentYear - 3);
+            d4.setLicenseCategories(List.of("B"));
+            driverService.save(d4);
+            Driver d5 = new Driver("Dmytro Bondarenko", currentYear - 6);
+            d5.setLicenseCategories(List.of("B", "C"));
+            driverService.save(d5);
         }
 
         if (carService.count() == 0) {

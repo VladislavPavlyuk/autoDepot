@@ -20,7 +20,7 @@ const DriversTable = ({ drivers, onAddDriver }: DriversTableProps) => {
 
   const formatMoney = (value: number) => {
     const locale = language === "uk" ? "uk-UA" : "en-US";
-    const currency = language === "uk" ? "UAH" : "USD";
+    const currency = "EUR";
     return new Intl.NumberFormat(locale, { style: "currency", currency }).format(value);
   };
 

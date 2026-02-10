@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import Swal from "sweetalert2";
 import ActivityFeed from "./components/ActivityFeed";
-import Hero from "./components/Hero";
 import DriversTable from "./components/DriversTable";
+import ErrorsPanel from "./components/ErrorsPanel";
+import Hero from "./components/Hero";
 import OrdersTable from "./components/OrdersTable";
 import StatCard from "./components/StatCard";
 import TopBar from "./components/TopBar";
@@ -10,11 +11,13 @@ import TripsTable from "./components/TripsTable";
 import { createDriver, createOrder, generateOrder } from "./api/dashboardApi";
 import { useDashboardData } from "./hooks/useDashboardData";
 import { useI18n } from "./i18n";
+import { DEFAULT_ERRORS_POLICY } from "./types/errors";
 
 const App = () => {
   const { data, refetch } = useDashboardData();
   const [search, setSearch] = useState("");
   const [currentTime, setCurrentTime] = useState("");
+  const [showErrorsPanel, setShowErrorsPanel] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">(() => {
     if (typeof window === "undefined") return "dark";
     const saved = window.localStorage.getItem("autodepot.theme");
@@ -227,10 +230,13 @@ const App = () => {
       });
       refetch();
     } catch (error) {
+      const msg =
+        (error as Error & { serverMessage?: string }).serverMessage ??
+        (error instanceof Error ? error.message : t("dialog.generateFail.text"));
       await Swal.fire({
         icon: "error",
         title: t("dialog.generateFail.title"),
-        text: error instanceof Error ? error.message : t("dialog.generateFail.text")
+        text: msg
       });
     }
   };
@@ -337,12 +343,21 @@ const App = () => {
       <TopBar
         onSearch={setSearch}
         onCreateOrder={handleCreateOrder}
+        onOpenErrors={() => setShowErrorsPanel(true)}
         currentTime={currentTime}
         language={language}
         onLanguageChange={setLanguage}
         theme={theme}
         onThemeToggle={() => setTheme(theme === "dark" ? "light" : "dark")}
       />
+
+      {showErrorsPanel && (
+        <div className="errors-panel-overlay" onClick={() => setShowErrorsPanel(false)} role="presentation">
+          <div onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Error audit log">
+            <ErrorsPanel policy={DEFAULT_ERRORS_POLICY} onClose={() => setShowErrorsPanel(false)} />
+          </div>
+        </div>
+      )}
 
       <main className="content">
         <Hero

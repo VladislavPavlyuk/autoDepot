@@ -82,10 +82,10 @@ class TripServiceTest {
 
     @BeforeEach
     void setUp() {
-        testOrder = new Order("New York", "STANDARD", 1000.0);
+        testOrder = new Order("Berlin", "STANDARD", 1000.0);
         testOrder.setId(1L);
 
-        testDriver = new Driver("John Smith", 5);
+        testDriver = new Driver("Ivan Petrenko", 5);
         testDriver.setId(1L);
         testDriver.setAvailable(true);
 
@@ -171,14 +171,14 @@ class TripServiceTest {
 
     @Test
     void createTrip_WhenHazardousOrder_SelectsSeniorDriver() {
-        Order hazardousOrder = new Order("Los Angeles", "HAZARDOUS", 1000.0);
+        Order hazardousOrder = new Order("Paris", "HAZARDOUS", 1000.0);
         hazardousOrder.setId(2L);
         
-        Driver juniorDriver = new Driver("Junior Driver", 3);
+        Driver juniorDriver = new Driver("Andrii Melnyk", 3);
         juniorDriver.setId(2L);
         juniorDriver.setAvailable(true);
         
-        Driver seniorDriver = new Driver("Senior Driver", 12);
+        Driver seniorDriver = new Driver("Oleksandr Shevchenko", 12);
         seniorDriver.setId(3L);
         seniorDriver.setAvailable(true);
 

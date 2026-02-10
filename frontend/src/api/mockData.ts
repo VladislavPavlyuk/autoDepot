@@ -8,14 +8,14 @@ export const mockDashboard: DashboardData = {
     { label: "On-Time Rate", value: "92%", trend: "+3%" }
   ],
   orders: [
-    { id: "ORD-2041", orderId: 2041, cargo: "Крихкий", destination: "Нью-Йорк", weight: "1,436 кг", status: "QUEUED" },
-    { id: "ORD-2042", orderId: 2042, cargo: "Небезпечний", destination: "Філадельфія", weight: "1,804 кг", status: "ASSIGNED" },
-    { id: "ORD-2043", orderId: 2043, cargo: "Стандартний", destination: "Чикаго", weight: "2,401 кг", status: "READY" }
+    { id: "ORD-2041", orderId: 2041, cargo: "FRAGILE", destination: "Berlin", weight: "1,436 kg", status: "QUEUED" },
+    { id: "ORD-2042", orderId: 2042, cargo: "HAZARDOUS", destination: "Vienna", weight: "1,804 kg", status: "ASSIGNED" },
+    { id: "ORD-2043", orderId: 2043, cargo: "STANDARD", destination: "Madrid", weight: "2,401 kg", status: "READY" }
   ],
   trips: [
-    { id: "TR-011", tripId: 11, driver: "James Davis", car: "C-05", status: "COMPLETED", payment: "$258,542.99" },
-    { id: "TR-010", tripId: 10, driver: "Michael Johnson", car: "C-04", status: "COMPLETED", payment: "$215,402.77" },
-    { id: "TR-009", tripId: 9, driver: "David Williams", car: "C-01", status: "REPAIR_REQUESTED", payment: "$0.00" }
+    { id: "TR-011", tripId: 11, driver: "Dmytro Bondarenko", car: "C-05", status: "COMPLETED", payment: "€258,542.99" },
+    { id: "TR-010", tripId: 10, driver: "Mykhailo Kovalenko", car: "C-04", status: "COMPLETED", payment: "€215,402.77" },
+    { id: "TR-009", tripId: 9, driver: "Oleksandr Shevchenko", car: "C-01", status: "REPAIR_REQUESTED", payment: "€0.00" }
   ],
   activity: [
     "Trip TR-011 completed successfully",
@@ -24,7 +24,7 @@ export const mockDashboard: DashboardData = {
   ],
   driverPerformance: [
     {
-      driverName: "John Smith",
+      driverName: "Ivan Petrenko",
       tripCount: 12,
       totalWeight: 18500,
       earnings: 124500,
@@ -32,7 +32,7 @@ export const mockDashboard: DashboardData = {
       experience: 12
     },
     {
-      driverName: "Michael Johnson",
+      driverName: "Mykhailo Kovalenko",
       tripCount: 9,
       totalWeight: 13200,
       earnings: 102300,
@@ -40,7 +40,7 @@ export const mockDashboard: DashboardData = {
       experience: 9
     },
     {
-      driverName: "David Williams",
+      driverName: "Oleksandr Shevchenko",
       tripCount: 6,
       totalWeight: 9100,
       earnings: 78400,

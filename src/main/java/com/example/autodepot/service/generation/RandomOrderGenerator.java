@@ -10,8 +10,8 @@ import java.util.Random;
 @Component
 public class RandomOrderGenerator implements OrderGenerator {
     private static final List<String> DESTINATIONS = Arrays.asList(
-        "New York", "Los Angeles", "Chicago", "Houston",
-        "Phoenix", "Philadelphia", "San Antonio", "San Diego"
+        "Berlin", "Paris", "Madrid", "Rome", "Amsterdam",
+        "Vienna", "Warsaw", "Brussels", "Prague", "Budapest"
     );
 
     private static final List<String> CARGO_TYPES = Arrays.asList(

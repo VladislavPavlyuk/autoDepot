@@ -25,7 +25,7 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/fleet/**").authenticated()
+                .requestMatchers("/fleet/**", "/api/errors", "/api/errors/**").authenticated()
                 .requestMatchers("/login", "/").permitAll()
                 .anyRequest().permitAll()
             )

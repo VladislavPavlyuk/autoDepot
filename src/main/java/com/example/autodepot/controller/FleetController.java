@@ -15,8 +15,6 @@ import com.example.autodepot.service.TripService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 
 @Controller
 @RequestMapping("/fleet")
@@ -68,48 +66,29 @@ public class FleetController {
     }
 
     @PostMapping("/trips/assign")
-    public String assignTrip(@ModelAttribute TripAssignDTO tripAssignDTO,
-                             RedirectAttributes redirectAttributes) {
-        try {
-            tripService.createTrip(tripAssignDTO);
-        } catch (RuntimeException ex) {
-            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
-        }
+    public String assignTrip(@ModelAttribute TripAssignDTO tripAssignDTO) {
+        tripService.createTrip(tripAssignDTO);
         return "redirect:/fleet/dashboard";
     }
 
     @PostMapping("/trips/{tripId}/complete")
-    public String completeTrip(@PathVariable Long tripId, 
-                              @ModelAttribute TripCompleteDTO tripCompleteDTO,
-                              RedirectAttributes redirectAttributes) {
+    public String completeTrip(@PathVariable Long tripId, @ModelAttribute TripCompleteDTO tripCompleteDTO) {
         tripCompleteDTO.setTripId(tripId);
-        try {
-            tripService.completeTrip(tripCompleteDTO);
-        } catch (RuntimeException ex) {
-            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
-        }
+        tripService.completeTrip(tripCompleteDTO);
         return "redirect:/fleet/dashboard";
     }
 
     @PostMapping("/trips/{tripId}/breakdown")
-    public String reportBreakdown(@PathVariable Long tripId, RedirectAttributes redirectAttributes) {
+    public String reportBreakdown(@PathVariable Long tripId) {
         TripBreakdownDTO breakdownDTO = tripCommandMapper.toBreakdownDto(tripId);
-        try {
-            tripService.processBreakdown(breakdownDTO);
-        } catch (RuntimeException ex) {
-            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
-        }
+        tripService.processBreakdown(breakdownDTO);
         return "redirect:/fleet/dashboard";
     }
 
     @PostMapping("/trips/{tripId}/repair")
-    public String requestRepair(@PathVariable Long tripId, RedirectAttributes redirectAttributes) {
+    public String requestRepair(@PathVariable Long tripId) {
         TripRepairDTO repairDTO = tripCommandMapper.toRepairDto(tripId);
-        try {
-            tripService.requestRepair(repairDTO);
-        } catch (RuntimeException ex) {
-            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
-        }
+        tripService.requestRepair(repairDTO);
         return "redirect:/fleet/dashboard";
     }
 

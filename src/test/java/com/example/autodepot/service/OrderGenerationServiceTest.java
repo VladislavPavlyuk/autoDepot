@@ -32,7 +32,7 @@ class OrderGenerationServiceTest {
 
     @Test
     void generateRandomOrder_WhenCalled_SavesGeneratedOrder() {
-        Order generatedOrder = new Order("New York", "STANDARD", 1000.0);
+        Order generatedOrder = new Order("Berlin", "STANDARD", 1000.0);
         when(orderGenerator.generate()).thenReturn(generatedOrder);
         when(orderService.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -50,7 +50,7 @@ class OrderGenerationServiceTest {
 
     @Test
     void generateRandomOrder_WhenGeneratedOrderValid_SavesOrderWithValidFields() {
-        Order generatedOrder = new Order("Chicago", "FRAGILE", 2500.0);
+        Order generatedOrder = new Order("Madrid", "FRAGILE", 2500.0);
         when(orderGenerator.generate()).thenReturn(generatedOrder);
         when(orderService.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
 

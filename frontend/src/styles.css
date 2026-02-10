@@ -454,3 +454,121 @@ body {
     align-items: flex-start;
   }
 }
+
+/* Errors audit panel (overlay) */
+.errors-panel-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.errors-panel {
+  background: var(--surface-strong);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  max-width: 1200px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.errors-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.errors-panel-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.errors-filters {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.errors-filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.errors-filters input {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text);
+  min-width: 180px;
+}
+
+.errors-panel-error {
+  padding: 12px 20px;
+  color: #f87171;
+  font-size: 14px;
+}
+
+.errors-panel-loading {
+  padding: 20px;
+  color: var(--muted);
+}
+
+.errors-meta {
+  padding: 8px 20px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.errors-table-wrap {
+  overflow: auto;
+  flex: 1;
+  min-height: 200px;
+}
+
+.errors-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.errors-table th,
+.errors-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.errors-table th {
+  color: var(--muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.errors-table td {
+  vertical-align: top;
+}
+
+.errors-pagination {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+}

@@ -15,7 +15,6 @@ import com.example.autodepot.service.TripService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ui.Model;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.*;
 
@@ -50,7 +49,7 @@ class FleetControllerTest {
     void getDashboard_WhenCalled_ReturnsDashboardView() {
         StatsSummaryDTO stats = new StatsSummaryDTO();
         stats.setDriverPerformance(new ArrayList<>());
-        stats.setMostProfitableDriver("John Smith ($500.00)");
+        stats.setMostProfitableDriver("Ivan Petrenko (€500.00)");
         stats.setDriverEarnings(new ArrayList<>());
         stats.setCargoByDestination(new ArrayList<>());
         when(statsService.getAllStats()).thenReturn(stats);
@@ -66,7 +65,7 @@ class FleetControllerTest {
 
     @Test
     void createOrder_WhenCalled_ReturnsRedirectToDashboard() {
-        OrderDTO orderDTO = new OrderDTO("New York", "STANDARD", 1000.0);
+        OrderDTO orderDTO = new OrderDTO("Berlin", "STANDARD", 1000.0);
 
         String actualResult = fleetController.createOrder(orderDTO);
         String expectedResult = "redirect:/fleet/dashboard";
@@ -89,7 +88,7 @@ class FleetControllerTest {
         TripAssignDTO assignDTO = new TripAssignDTO();
         assignDTO.setOrderId(1L);
 
-        String actualResult = fleetController.assignTrip(assignDTO, mock(RedirectAttributes.class));
+        String actualResult = fleetController.assignTrip(assignDTO);
         String expectedResult = "redirect:/fleet/dashboard";
 
         assertEquals(expectedResult, actualResult);
@@ -101,7 +100,7 @@ class FleetControllerTest {
         TripCompleteDTO completeDTO = new TripCompleteDTO();
         completeDTO.setCarStatus("OK");
 
-        String actualResult = fleetController.completeTrip(1L, completeDTO, mock(RedirectAttributes.class));
+        String actualResult = fleetController.completeTrip(1L, completeDTO);
         String expectedResult = "redirect:/fleet/dashboard";
 
         assertEquals(expectedResult, actualResult);
@@ -114,7 +113,7 @@ class FleetControllerTest {
         breakdownDTO.setTripId(1L);
         when(tripCommandMapper.toBreakdownDto(1L)).thenReturn(breakdownDTO);
 
-        String actualResult = fleetController.reportBreakdown(1L, mock(RedirectAttributes.class));
+        String actualResult = fleetController.reportBreakdown(1L);
         String expectedResult = "redirect:/fleet/dashboard";
 
         assertEquals(expectedResult, actualResult);
@@ -127,7 +126,7 @@ class FleetControllerTest {
         repairDTO.setTripId(1L);
         when(tripCommandMapper.toRepairDto(1L)).thenReturn(repairDTO);
 
-        String actualResult = fleetController.requestRepair(1L, mock(RedirectAttributes.class));
+        String actualResult = fleetController.requestRepair(1L);
         String expectedResult = "redirect:/fleet/dashboard";
 
         assertEquals(expectedResult, actualResult);

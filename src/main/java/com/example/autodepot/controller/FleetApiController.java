@@ -7,6 +7,7 @@ import com.example.autodepot.dto.DashboardTripDTO;
 import com.example.autodepot.dto.DriverCreateDTO;
 import com.example.autodepot.dto.DriverPerformanceDTO;
 import com.example.autodepot.dto.OrderDTO;
+import com.example.autodepot.exception.BadRequestException;
 import com.example.autodepot.dto.OrderViewDTO;
 import com.example.autodepot.dto.StatsSummaryDTO;
 import com.example.autodepot.dto.TripAssignDTO;
@@ -47,8 +48,10 @@ public class FleetApiController {
     private static final Logger log = LoggerFactory.getLogger(FleetApiController.class);
     private static final String LOG_FILE = "trips.log";
     private static final int ACTIVITY_LIMIT = 12;
-    private static final NumberFormat CURRENCY_FORMAT = NumberFormat.getCurrencyInstance(Locale.US);
-    private static final NumberFormat WEIGHT_FORMAT = NumberFormat.getNumberInstance(Locale.US);
+    private static final int MAX_ORDER_STRING_LENGTH = 255;
+    private static final double MAX_ORDER_WEIGHT_KG = 100_000.0;
+    private static final NumberFormat CURRENCY_FORMAT = NumberFormat.getCurrencyInstance(Locale.GERMANY);
+    private static final NumberFormat WEIGHT_FORMAT = NumberFormat.getNumberInstance(Locale.UK);
 
     static {
         WEIGHT_FORMAT.setMaximumFractionDigits(0);
@@ -99,80 +102,84 @@ public class FleetApiController {
 
     @PostMapping(value = "/drivers", consumes = {"application/json", "application/json;charset=UTF-8"})
     public ResponseEntity<Map<String, String>> createDriver(@RequestBody(required = false) byte[] rawBytes) {
-        try {
-            String rawBody = rawBytes == null || rawBytes.length == 0
-                ? null
-                : new String(rawBytes, java.nio.charset.StandardCharsets.UTF_8);
-            if (rawBody == null || rawBody.isBlank()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "Request body is required. Send JSON: name, licenseYear, licenseCategories (array)."));
-            }
-            DriverCreateDTO driverCreateDTO;
-            try {
-                driverCreateDTO = OBJECT_MAPPER.readValue(rawBody, DriverCreateDTO.class);
-            } catch (IOException e) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "Invalid JSON: " + (e.getMessage() != null ? e.getMessage() : "parse error")));
-            }
-            if (driverCreateDTO == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Driver payload is required"));
-            }
-            String name = driverCreateDTO.getName() == null ? "" : driverCreateDTO.getName().trim();
-            if (name.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Driver name is required"));
-            }
-            List<String> categories = driverCreateDTO.getLicenseCategories();
-            if (categories == null || categories.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "At least one license category (A–E) is required"));
-            }
-            List<String> valid = new ArrayList<>();
-            for (String c : categories) {
-                String cat = c == null ? "" : c.trim().toUpperCase();
-                if (cat.matches("^[A-E]$") && !valid.contains(cat)) {
-                    valid.add(cat);
-                }
-            }
-            if (valid.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "Driver license categories must be one or more of A, B, C, D, E"));
-            }
-            Integer licenseYear = driverCreateDTO.getLicenseYear();
-            int currentYear = java.time.Year.now().getValue();
-            if (licenseYear == null || licenseYear < 1970 || licenseYear > currentYear) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "Driver license year must be between 1970 and current year"));
-            }
-
-            Driver driver = new Driver(name, licenseYear);
-            driver.setLicenseCategories(valid);
-            driver.setAvailable(true);
-            driver.setEarnings(0.0);
-            driverService.save(driver);
-            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "created"));
-        } catch (Exception e) {
-            log.error("Create driver failed", e);
-            Throwable t = e;
-            while (t.getCause() != null) t = t.getCause();
-            String msg = t.getMessage() != null && !t.getMessage().isBlank()
-                ? t.getMessage()
-                : t.getClass().getSimpleName();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
-                .body(Map.of("message", msg));
+        String rawBody = rawBytes == null || rawBytes.length == 0
+            ? null
+            : new String(rawBytes, java.nio.charset.StandardCharsets.UTF_8);
+        if (rawBody == null || rawBody.isBlank()) {
+            throw new BadRequestException("Request body is required. Send JSON: name, licenseYear, licenseCategories (array).");
         }
+        DriverCreateDTO driverCreateDTO;
+        try {
+            driverCreateDTO = OBJECT_MAPPER.readValue(rawBody, DriverCreateDTO.class);
+        } catch (IOException e) {
+            throw new BadRequestException("Invalid JSON: " + (e.getMessage() != null ? e.getMessage() : "parse error"));
+        }
+        if (driverCreateDTO == null) {
+            throw new BadRequestException("Driver payload is required");
+        }
+        String name = driverCreateDTO.getName() == null ? "" : driverCreateDTO.getName().trim();
+        if (name.isEmpty()) {
+            throw new BadRequestException("Driver name is required");
+        }
+        if (name.length() > MAX_ORDER_STRING_LENGTH) {
+            throw new BadRequestException("Driver name must be at most " + MAX_ORDER_STRING_LENGTH + " characters");
+        }
+        List<String> categories = driverCreateDTO.getLicenseCategories();
+        if (categories == null || categories.isEmpty()) {
+            throw new BadRequestException("At least one license category (A–E) is required");
+        }
+        List<String> valid = new ArrayList<>();
+        for (String c : categories) {
+            String cat = c == null ? "" : c.trim().toUpperCase();
+            if (cat.matches("^[A-E]$") && !valid.contains(cat)) {
+                valid.add(cat);
+            }
+        }
+        if (valid.isEmpty()) {
+            throw new BadRequestException("Driver license categories must be one or more of A, B, C, D, E");
+        }
+        Integer licenseYear = driverCreateDTO.getLicenseYear();
+        int currentYear = java.time.Year.now().getValue();
+        if (licenseYear == null || licenseYear < 1970 || licenseYear > currentYear) {
+            throw new BadRequestException("Driver license year must be between 1970 and current year");
+        }
+        Driver driver = new Driver(name, licenseYear);
+        driver.setLicenseCategories(valid);
+        driver.setAvailable(true);
+        driver.setEarnings(0.0);
+        driverService.save(driver);
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "created"));
     }
 
     @PostMapping("/orders")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void createOrder(@RequestBody OrderDTO orderDTO) {
+    public ResponseEntity<Map<String, String>> createOrder(@RequestBody OrderDTO orderDTO) {
+        if (orderDTO == null) {
+            throw new BadRequestException("Order payload is required");
+        }
+        String dest = orderDTO.getDestination() == null ? "" : orderDTO.getDestination().trim();
+        String cargo = orderDTO.getCargoType() == null ? "" : orderDTO.getCargoType().trim();
+        if (dest.isEmpty()) {
+            throw new BadRequestException("Destination is required");
+        }
+        if (cargo.isEmpty()) {
+            throw new BadRequestException("Cargo type is required");
+        }
+        if (dest.length() > MAX_ORDER_STRING_LENGTH || cargo.length() > MAX_ORDER_STRING_LENGTH) {
+            throw new BadRequestException("Destination and cargo type must be at most " + MAX_ORDER_STRING_LENGTH + " characters");
+        }
+        double weight = orderDTO.getWeight();
+        if (weight <= 0 || weight > MAX_ORDER_WEIGHT_KG) {
+            throw new BadRequestException("Weight must be between 0 and " + (long) MAX_ORDER_WEIGHT_KG + " kg");
+        }
         orderApplicationService.createOrder(orderDTO);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/orders/generate")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void generateRandomOrder() {
+    public ResponseEntity<?> generateRandomOrder() {
+        log.info("POST /api/orders/generate received");
         orderGenerationService.generateRandomOrder();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/trips/assign")
@@ -329,12 +336,12 @@ public class FleetApiController {
 
     private String formatPayment(Double payment) {
         if (payment == null) {
-            return "$0.00";
+            return "€0.00";
         }
         return CURRENCY_FORMAT.format(payment);
     }
 
     private String formatWeight(double weight) {
-        return WEIGHT_FORMAT.format(weight) + " кг";
+        return WEIGHT_FORMAT.format(weight) + " kg";
     }
 }

@@ -71,6 +71,7 @@ public class StatsService {
             if (Map.class.isAssignableFrom(type)) {
                 return type.cast(java.util.Collections.emptyMap());
             }
+            return null;
         }
         if (!type.isInstance(value)) {
             throw new IllegalStateException("Stats type mismatch for key: " + key);

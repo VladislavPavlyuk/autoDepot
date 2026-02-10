@@ -62,7 +62,7 @@ export default function ErrorsPanel({ policy, onClose }: ErrorsPanelProps) {
 
   useEffect(() => {
     load({ page, size: policy.pageSize, sinceEpochMilli: sinceEpoch ?? undefined, exceptionType: exceptionType.trim() || undefined });
-  }, [page, sinceEpoch, load, policy.pageSize]);
+  }, [page, sinceEpoch, exceptionType, load, policy.pageSize]);
 
   const applyFilters = () => {
     setPage(0);

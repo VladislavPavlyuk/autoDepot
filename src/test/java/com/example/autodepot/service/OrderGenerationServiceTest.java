@@ -4,6 +4,7 @@ import com.example.autodepot.entity.Order;
 import com.example.autodepot.service.generation.OrderCountStrategy;
 import com.example.autodepot.service.generation.OrderGenerator;
 import com.example.autodepot.service.data.OrderService;
+import com.example.autodepot.service.impl.OrderGenerationServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,7 +29,7 @@ class OrderGenerationServiceTest {
     private OrderCountStrategy orderCountStrategy;
 
     @InjectMocks
-    private OrderGenerationService orderGenerationService;
+    private OrderGenerationServiceImpl orderGenerationService;
 
     @Test
     void generateRandomOrder_WhenCalled_SavesGeneratedOrder() {

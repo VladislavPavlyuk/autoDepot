@@ -4,6 +4,7 @@ import com.example.autodepot.dto.OrderDTO;
 import com.example.autodepot.entity.Order;
 import com.example.autodepot.mapper.OrderMapper;
 import com.example.autodepot.service.data.OrderService;
+import com.example.autodepot.service.impl.OrderApplicationServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -24,7 +25,7 @@ class OrderApplicationServiceTest {
     private OrderMapper orderMapper;
 
     @InjectMocks
-    private OrderApplicationService orderApplicationService;
+    private OrderApplicationServiceImpl orderApplicationService;
 
     @Test
     void createOrder_WhenValidDto_CallsMapperAndSave() {

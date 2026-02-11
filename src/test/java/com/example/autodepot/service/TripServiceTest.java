@@ -17,6 +17,7 @@ import com.example.autodepot.service.data.CarService;
 import com.example.autodepot.service.data.DriverService;
 import com.example.autodepot.service.data.OrderService;
 import com.example.autodepot.service.data.TripDataService;
+import com.example.autodepot.service.impl.TripServiceImpl;
 import com.example.autodepot.service.logging.TripEventLogger;
 import com.example.autodepot.service.payment.PaymentCalculator;
 import com.example.autodepot.service.selection.CarSelectionPolicy;
@@ -74,7 +75,7 @@ class TripServiceTest {
     private TripCommandMapper tripCommandMapper;
 
     @InjectMocks
-    private TripService tripService;
+    private TripServiceImpl tripService;
 
     private Order testOrder;
     private Driver testDriver;

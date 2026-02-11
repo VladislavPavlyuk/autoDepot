@@ -16,6 +16,7 @@ import com.example.autodepot.service.stats.DriverEarningsStatsAggregator;
 import com.example.autodepot.service.stats.DriverPerformanceStatsAggregator;
 import com.example.autodepot.service.stats.MostProfitableDriverStatsAggregator;
 import com.example.autodepot.service.stats.StatsAggregator;
+import com.example.autodepot.service.impl.StatsServiceImpl;
 import com.example.autodepot.service.stats.StatsKeyRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,7 +78,7 @@ class StatsServiceTest {
         );
         StatsMapper statsMapper = new StatsMapper() {
         };
-        statsService = new StatsService(new StatsKeyRegistry(aggregators), statsMapper);
+        statsService = new StatsServiceImpl(new StatsKeyRegistry(aggregators), statsMapper);
     }
 
     @Test

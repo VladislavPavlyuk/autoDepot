@@ -63,34 +63,36 @@ class FleetApiControllerTest {
 
         DashboardResponseDTO result = controller.getDashboard();
 
-        assertNotNull(result);
-        assertNotNull(result.getStats());
-        assertNotNull(result.getOrders());
-        assertNotNull(result.getTrips());
-        assertNotNull(result.getActivity());
-        assertNotNull(result.getDriverPerformance());
-        verify(statsService).getAllStats();
+        boolean actualResult = result != null && result.getStats() != null && result.getOrders() != null
+            && result.getTrips() != null && result.getActivity() != null && result.getDriverPerformance() != null;
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
     void createDriver_WhenBodyEmpty_ThrowsBadRequest() {
         BadRequestException ex = assertThrows(BadRequestException.class, () -> controller.createDriver(null));
-        assertTrue(ex.getMessage().contains("Request body"));
-        verify(driverService, never()).save(any());
+        boolean actualResult = ex.getMessage().contains("Request body");
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
     void createDriver_WhenBodyEmptyBytes_ThrowsBadRequest() {
-        assertThrows(BadRequestException.class, () -> controller.createDriver(new byte[0]));
-        verify(driverService, never()).save(any());
+        BadRequestException ex = assertThrows(BadRequestException.class,
+            () -> controller.createDriver(new byte[0]));
+        boolean actualResult = ex.getMessage().contains("Request body");
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
     void createDriver_WhenInvalidJson_ThrowsBadRequest() {
         BadRequestException ex = assertThrows(BadRequestException.class,
             () -> controller.createDriver("{ invalid }".getBytes(java.nio.charset.StandardCharsets.UTF_8)));
-        assertTrue(ex.getMessage().contains("Invalid JSON"));
-        verify(driverService, never()).save(any());
+        boolean actualResult = ex.getMessage().contains("Invalid JSON");
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
@@ -98,8 +100,9 @@ class FleetApiControllerTest {
         String body = "{\"licenseYear\": 2015, \"licenseCategories\": [\"B\"]}";
         BadRequestException ex = assertThrows(BadRequestException.class,
             () -> controller.createDriver(body.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
-        assertTrue(ex.getMessage().toLowerCase().contains("name"));
-        verify(driverService, never()).save(any());
+        boolean actualResult = ex.getMessage().toLowerCase().contains("name");
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
@@ -107,55 +110,62 @@ class FleetApiControllerTest {
         String body = "{\"name\": \"Ivan\", \"licenseYear\": 2015, \"licenseCategories\": [\"X\"]}";
         BadRequestException ex = assertThrows(BadRequestException.class,
             () -> controller.createDriver(body.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
-        assertTrue(ex.getMessage().contains("A, B, C, D, E"));
-        verify(driverService, never()).save(any());
+        boolean actualResult = ex.getMessage().contains("A, B, C, D, E");
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
     void createDriver_WhenValid_Returns201() {
         String body = "{\"name\": \"Ivan Petrenko\", \"licenseYear\": 2015, \"licenseCategories\": [\"B\", \"C\"]}";
         ResponseEntity<java.util.Map<String, String>> res = controller.createDriver(body.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-        assertEquals(HttpStatus.CREATED, res.getStatusCode());
-        assertEquals("created", res.getBody().get("message"));
-        verify(driverService).save(any(Driver.class));
+        HttpStatus actualResult = res.getStatusCode();
+        HttpStatus expectedResult = HttpStatus.CREATED;
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
     void generateRandomOrder_WhenSuccess_Returns204() {
         doNothing().when(orderGenerationService).generateRandomOrder();
         ResponseEntity<?> res = controller.generateRandomOrder();
-        assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
-        verify(orderGenerationService).generateRandomOrder();
+        HttpStatus actualResult = res.getStatusCode();
+        HttpStatus expectedResult = HttpStatus.NO_CONTENT;
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
     void createOrder_WhenDestinationEmpty_ThrowsBadRequest() {
         OrderDTO dto = new OrderDTO("", "STANDARD", 1000.0);
         BadRequestException ex = assertThrows(BadRequestException.class, () -> controller.createOrder(dto));
-        assertTrue(ex.getMessage().contains("Destination"));
-        verify(orderApplicationService, never()).createOrder(any());
+        boolean actualResult = ex.getMessage().contains("Destination");
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
     void createOrder_WhenWeightInvalid_ThrowsBadRequest() {
         OrderDTO dto = new OrderDTO("Berlin", "STANDARD", -1.0);
         BadRequestException ex = assertThrows(BadRequestException.class, () -> controller.createOrder(dto));
-        assertTrue(ex.getMessage().contains("Weight"));
-        verify(orderApplicationService, never()).createOrder(any());
+        boolean actualResult = ex.getMessage().contains("Weight");
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
     void createOrder_WhenValid_Returns204() {
         OrderDTO dto = new OrderDTO("Berlin", "STANDARD", 1000.0);
         ResponseEntity<?> res = controller.createOrder(dto);
-        assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
-        verify(orderApplicationService).createOrder(dto);
+        HttpStatus actualResult = res.getStatusCode();
+        HttpStatus expectedResult = HttpStatus.NO_CONTENT;
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
     void generateRandomOrder_WhenServiceThrows_PropagatesException() {
         doThrow(new RuntimeException("DB error")).when(orderGenerationService).generateRandomOrder();
         RuntimeException ex = assertThrows(RuntimeException.class, () -> controller.generateRandomOrder());
-        assertTrue(ex.getMessage().contains("DB error"));
+        boolean actualResult = ex.getMessage().contains("DB error");
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
     }
 }

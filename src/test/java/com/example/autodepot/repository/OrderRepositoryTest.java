@@ -23,29 +23,33 @@ class OrderRepositoryTest extends AbstractPostgresTest {
     }
 
     @Test
-    void save_WhenOrderSaved_ReturnsEntityWithId() {
+    void save_WhenOrderSaved_ReturnsEntityWithIdAndFields() {
         Order order = new Order("Berlin", "STANDARD", 1000.0);
         Order saved = orderRepository.save(order);
 
-        assertNotNull(saved.getId());
-        assertEquals("Berlin", saved.getDestination());
-        assertEquals("STANDARD", saved.getCargoType());
-        assertEquals(1000.0, saved.getWeight());
+        boolean actualResult = saved.getId() != null
+            && "Berlin".equals(saved.getDestination())
+            && "STANDARD".equals(saved.getCargoType())
+            && saved.getWeight() == 1000.0;
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
-    void findById_WhenOrderExists_ReturnsOrder() {
+    void findById_WhenOrderExists_ReturnsOrderWithDestination() {
         Order order = orderRepository.save(new Order("Paris", "FRAGILE", 500.0));
 
         Optional<Order> found = orderRepository.findById(order.getId());
-
-        assertTrue(found.isPresent());
-        assertEquals("Paris", found.get().getDestination());
+        String actualResult = found.map(Order::getDestination).orElse(null);
+        String expectedResult = "Paris";
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
     void findById_WhenOrderNotExists_ReturnsEmpty() {
         Optional<Order> found = orderRepository.findById(999999L);
-        assertTrue(found.isEmpty());
+        boolean actualResult = found.isEmpty();
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
     }
 }

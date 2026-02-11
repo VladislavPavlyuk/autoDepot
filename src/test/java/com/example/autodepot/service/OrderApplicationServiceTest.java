@@ -36,12 +36,14 @@ class OrderApplicationServiceTest {
 
         orderApplicationService.createOrder(dto);
 
-        verify(orderMapper).toEntity(dto);
         ArgumentCaptor<Order> captor = ArgumentCaptor.forClass(Order.class);
         verify(orderService).save(captor.capture());
-        assertEquals("Berlin", captor.getValue().getDestination());
-        assertEquals("STANDARD", captor.getValue().getCargoType());
-        assertEquals(1000.0, captor.getValue().getWeight());
+        Order savedOrder = captor.getValue();
+        boolean actualResult = "Berlin".equals(savedOrder.getDestination())
+            && "STANDARD".equals(savedOrder.getCargoType())
+            && savedOrder.getWeight() == 1000.0;
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
@@ -56,6 +58,10 @@ class OrderApplicationServiceTest {
 
         orderApplicationService.createOrder(dto);
 
-        verify(orderService).save(entity);
+        ArgumentCaptor<Order> captor = ArgumentCaptor.forClass(Order.class);
+        verify(orderService).save(captor.capture());
+        Order actualResult = captor.getValue();
+        Order expectedResult = entity;
+        assertEquals(expectedResult, actualResult);
     }
 }

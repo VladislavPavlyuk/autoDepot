@@ -24,16 +24,18 @@ class ErrorAuditRepositoryTest extends AbstractPostgresTest {
     }
 
     @Test
-    void save_WhenErrorAuditSaved_ReturnsEntityWithId() {
+    void save_WhenErrorAuditSaved_ReturnsEntityWithIdAndFields() {
         ErrorAudit audit = new ErrorAudit(
             Instant.now(), "main", "SomeService.method",
             "java.lang.RuntimeException", "Test error"
         );
         ErrorAudit saved = errorAuditRepository.save(audit);
 
-        assertNotNull(saved.getId());
-        assertEquals("java.lang.RuntimeException", saved.getExceptionType());
-        assertEquals("Test error", saved.getMessage());
+        boolean actualResult = saved.getId() != null
+            && "java.lang.RuntimeException".equals(saved.getExceptionType())
+            && "Test error".equals(saved.getMessage());
+        boolean expectedResult = true;
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
@@ -44,8 +46,9 @@ class ErrorAuditRepositoryTest extends AbstractPostgresTest {
             Instant.now(), "t2", "loc2", "Ex2", "msg2"));
 
         var page = errorAuditRepository.findAllFiltered(null, null, PageRequest.of(0, 10));
-
-        assertEquals(2, page.getTotalElements());
+        long actualResult = page.getTotalElements();
+        long expectedResult = 2L;
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
@@ -56,7 +59,8 @@ class ErrorAuditRepositoryTest extends AbstractPostgresTest {
         errorAuditRepository.save(new ErrorAudit(now, "t3", "loc3", "Ex2", "msg3"));
 
         var page = errorAuditRepository.findAllFiltered("Ex1", null, PageRequest.of(0, 10));
-
-        assertEquals(2, page.getTotalElements());
+        long actualResult = page.getTotalElements();
+        long expectedResult = 2L;
+        assertEquals(expectedResult, actualResult);
     }
 }

@@ -10,7 +10,6 @@ import org.mapstruct.Mapping;
 public interface OrderMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "trips", ignore = true)
     Order toEntity(OrderDTO dto);
     OrderViewDTO toViewDto(Order order);
 }

@@ -119,18 +119,14 @@ class FleetApiControllerTest {
     void createDriver_WhenValid_Returns201() {
         String body = "{\"name\": \"Ivan Petrenko\", \"licenseYear\": 2015, \"licenseCategories\": [\"B\", \"C\"]}";
         ResponseEntity<java.util.Map<String, String>> res = controller.createDriver(body.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-        HttpStatus actualResult = res.getStatusCode();
-        HttpStatus expectedResult = HttpStatus.CREATED;
-        assertEquals(expectedResult, actualResult);
+        assertEquals(HttpStatus.CREATED, res.getStatusCode());
     }
 
     @Test
     void generateRandomOrder_WhenSuccess_Returns204() {
         doNothing().when(orderGenerationService).generateRandomOrder();
         ResponseEntity<?> res = controller.generateRandomOrder();
-        HttpStatus actualResult = res.getStatusCode();
-        HttpStatus expectedResult = HttpStatus.NO_CONTENT;
-        assertEquals(expectedResult, actualResult);
+        assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
     }
 
     @Test
@@ -155,9 +151,7 @@ class FleetApiControllerTest {
     void createOrder_WhenValid_Returns204() {
         OrderDTO dto = new OrderDTO("Berlin", "STANDARD", 1000.0);
         ResponseEntity<?> res = controller.createOrder(dto);
-        HttpStatus actualResult = res.getStatusCode();
-        HttpStatus expectedResult = HttpStatus.NO_CONTENT;
-        assertEquals(expectedResult, actualResult);
+        assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
     }
 
     @Test

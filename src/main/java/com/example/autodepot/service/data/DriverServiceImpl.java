@@ -33,7 +33,6 @@ public class DriverServiceImpl implements DriverService {
     @Override
     @Transactional
     public Driver save(Driver driver) {
-        Driver saved = driverRepository.saveAndFlush(driver);
-        return saved;
+        return driverRepository.save(driver);
     }
 }

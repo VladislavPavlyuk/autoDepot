@@ -50,7 +50,7 @@ class OrderGenerationServiceTest {
     }
 
     @Test
-    void generateRandomOrder_WhenGeneratedOrderValid_SavesOrderWithValidFields() {
+    void generateRandomOrder_WhenGeneratorReturnsOrder_SavesSameOrderToRepository() {
         Order generatedOrder = new Order("Madrid", "FRAGILE", 2500.0);
         when(orderGenerator.generate()).thenReturn(generatedOrder);
         when(orderService.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));

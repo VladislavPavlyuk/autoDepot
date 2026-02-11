@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class AutoDepotApplicationTests extends AbstractPostgresTest {
 
 	@Test
-	void contextLoads_WhenApplicationStarts_ContextLoadsSuccessfully() {
+	void contextLoads_WhenApplicationStarts_LoadsSuccessfully() {
 		boolean actualResult = true;
 		boolean expectedResult = true;
 		assertEquals(expectedResult, actualResult);

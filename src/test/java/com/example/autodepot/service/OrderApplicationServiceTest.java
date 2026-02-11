@@ -45,7 +45,7 @@ class OrderApplicationServiceTest {
     }
 
     @Test
-    void createOrder_WhenDtoWithNullDestination_StillPassesToService() {
+    void createOrder_WhenDtoWithNullDestination_CallsSaveWithMappedEntity() {
         OrderDTO dto = new OrderDTO(null, "FRAGILE", 500.0);
         Order entity = new Order();
         entity.setDestination(null);

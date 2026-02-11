@@ -12,6 +12,14 @@ import { createDriver, createOrder, generateOrder } from "./api/dashboardApi";
 import { useDashboardData } from "./hooks/useDashboardData";
 import { useI18n } from "./i18n";
 import { DEFAULT_ERRORS_POLICY } from "./types/errors";
+import {
+  buildAddDriverHtml,
+  buildNewOrderHtml,
+  getAddDriverFormValues,
+  getApiErrorMessage,
+  getNewOrderFormValues,
+  setupNewOrderCustomInputs
+} from "./utils/dialogs";
 
 const App = () => {
   const { data, refetch } = useDashboardData();
@@ -105,108 +113,16 @@ const App = () => {
   }, [filteredTrips]);
 
   const handleCreateOrder = async () => {
-    const escapeHtml = (value: string) =>
-      value
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-
-    const renderOptions = (values: string[], placeholder: string) => {
-      const options = values
-        .map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`)
-        .join("");
-      return `
-        <option value="">${escapeHtml(placeholder)}</option>
-        ${options}
-        <option value="__custom__">${escapeHtml(t("dialog.newOrder.customValue"))}</option>
-      `;
-    };
-
     const result = await Swal.fire({
       title: t("dialog.newOrder.title"),
-      html:
-        `<select id="order-destination" class="swal2-select">
-          ${renderOptions(destinationOptions, t("dialog.newOrder.selectDestination"))}
-        </select>` +
-        `<input id="order-destination-custom" class="swal2-input" placeholder="${t(
-          "dialog.newOrder.customDestination"
-        )}">` +
-        `<select id="order-cargo" class="swal2-select">
-          ${renderOptions(cargoOptions, t("dialog.newOrder.selectCargo"))}
-        </select>` +
-        `<input id="order-cargo-custom" class="swal2-input" placeholder="${t(
-          "dialog.newOrder.customCargo"
-        )}">` +
-        `<input id="order-weight" class="swal2-input" placeholder="${t(
-          "dialog.newOrder.weight"
-        )}" type="number" min="0" step="0.1">`,
+      html: buildNewOrderHtml(destinationOptions, cargoOptions, t),
       focusConfirm: false,
       showCancelButton: true,
-      didOpen: () => {
-        const popup = Swal.getPopup();
-        const destinationSelect = popup?.querySelector<HTMLSelectElement>("#order-destination");
-        const cargoSelect = popup?.querySelector<HTMLSelectElement>("#order-cargo");
-        const destinationCustom = popup?.querySelector<HTMLInputElement>("#order-destination-custom");
-        const cargoCustom = popup?.querySelector<HTMLInputElement>("#order-cargo-custom");
-
-        const toggleCustom = (
-          select?: HTMLSelectElement | null,
-          input?: HTMLInputElement | null
-        ) => {
-          if (!select || !input) return;
-          const show = select.value === "__custom__";
-          input.style.display = show ? "block" : "none";
-          if (show) {
-            input.focus();
-          }
-          if (!show) {
-            input.value = "";
-          }
-        };
-
-        toggleCustom(destinationSelect, destinationCustom);
-        toggleCustom(cargoSelect, cargoCustom);
-
-        destinationSelect?.addEventListener("change", () =>
-          toggleCustom(destinationSelect, destinationCustom)
-        );
-        cargoSelect?.addEventListener("change", () => toggleCustom(cargoSelect, cargoCustom));
-      },
-      preConfirm: () => {
-        const popup = Swal.getPopup();
-        const destinationSelect =
-          popup?.querySelector<HTMLSelectElement>("#order-destination")?.value?.trim() ?? "";
-        const cargoSelect =
-          popup?.querySelector<HTMLSelectElement>("#order-cargo")?.value?.trim() ?? "";
-        const destinationCustom =
-          popup?.querySelector<HTMLInputElement>("#order-destination-custom")?.value?.trim() ?? "";
-        const cargoCustom =
-          popup?.querySelector<HTMLInputElement>("#order-cargo-custom")?.value?.trim() ?? "";
-
-        const destination =
-          destinationSelect === "__custom__" || !destinationSelect
-            ? destinationCustom
-            : destinationSelect;
-        const cargoType =
-          cargoSelect === "__custom__" || !cargoSelect ? cargoCustom : cargoSelect;
-        const weightValue = popup?.querySelector<HTMLInputElement>("#order-weight")?.value;
-        const weight = weightValue ? Number(weightValue) : NaN;
-
-        if (!destination || !cargoType || Number.isNaN(weight) || weight <= 0) {
-          Swal.showValidationMessage(t("dialog.newOrder.validation"));
-          return null;
-        }
-
-        return { destination, cargoType, weight };
-      }
+      didOpen: () => setupNewOrderCustomInputs(Swal),
+      preConfirm: () =>
+        getNewOrderFormValues(Swal.getPopup(), t("dialog.newOrder.validation"), Swal)
     });
-
-    if (!result.isConfirmed || !result.value) {
-      return;
-    }
-
+    if (!result.isConfirmed || !result.value) return;
     await createOrder(result.value);
     await Swal.fire({
       icon: "success",
@@ -230,90 +146,37 @@ const App = () => {
       });
       refetch();
     } catch (error) {
-      const msg =
-        (error as Error & { serverMessage?: string }).serverMessage ??
-        (error instanceof Error ? error.message : t("dialog.generateFail.text"));
       await Swal.fire({
         icon: "error",
         title: t("dialog.generateFail.title"),
-        text: msg
+        text: getApiErrorMessage(error, t("dialog.generateFail.text"))
       });
     }
   };
 
   const handleAddDriver = async () => {
     const nowYear = new Date().getFullYear();
-    const yearOptions = Array.from({ length: nowYear - 1969 }, (_, index) => String(1970 + index));
-    const categories = ["A", "B", "C", "D", "E"];
     const result = await Swal.fire({
       title: t("dialog.addDriver.title"),
-      html:
-        `<input id="driver-name" class="swal2-input" placeholder="${t(
-          "dialog.addDriver.name"
-        )}">` +
-        `<div class="driver-categories" style="text-align:left; margin: 1rem 0;">
-          <p style="margin:0 0 8px; font-size: 0.9em; color: var(--muted);">${t(
-            "dialog.addDriver.licenseCategory"
-          )}</p>
-          ${categories
-            .map(
-              (cat) =>
-                `<label style="display:inline-block; margin-right: 1rem;"><input type="checkbox" name="driver-cat" value="${cat}"> ${cat}</label>`
-            )
-            .join("")}
-        </div>` +
-        `<select id="driver-license-year" class="swal2-select">
-          <option value="">${t("dialog.addDriver.selectYear")}</option>
-          ${yearOptions.map((year) => `<option value="${year}">${year}</option>`).join("")}
-        </select>`,
+      html: buildAddDriverHtml(t, nowYear),
       focusConfirm: false,
       showCancelButton: true,
-      preConfirm: () => {
-        const popup = Swal.getPopup();
-        const name = popup?.querySelector<HTMLInputElement>("#driver-name")?.value?.trim() ?? "";
-        const checked = popup?.querySelectorAll<HTMLInputElement>('input[name="driver-cat"]:checked');
-        const licenseCategories = checked ? Array.from(checked).map((el) => el.value) : [];
-        const yearValue =
-          popup?.querySelector<HTMLSelectElement>("#driver-license-year")?.value?.trim() ?? "";
-        const year = yearValue ? Number(yearValue) : NaN;
-
-        if (!name || licenseCategories.length === 0 || Number.isNaN(year) || year < 1970 || year > nowYear) {
-          Swal.showValidationMessage(t("dialog.addDriver.validation"));
-          return null;
-        }
-
-        return {
-          name,
-          licenseYear: year,
-          licenseCategories
-        };
-      }
+      preConfirm: () =>
+        getAddDriverFormValues(
+          Swal.getPopup(),
+          nowYear,
+          t("dialog.addDriver.validation"),
+          Swal
+        )
     });
-
-    if (!result.isConfirmed || !result.value) {
-      return;
-    }
-
+    if (!result.isConfirmed || !result.value) return;
     try {
       await createDriver(result.value);
     } catch (err: unknown) {
-      const ax = err as { response?: { data?: unknown; status?: number }; serverMessage?: string };
-      let text =
-        ax.serverMessage ??
-        (ax.response?.data != null && typeof ax.response.data === "string"
-          ? ax.response.data
-          : ax.response?.data != null && typeof ax.response.data === "object"
-            ? [("message" in ax.response.data && (ax.response.data as { message: unknown }).message), ("error" in ax.response.data && (ax.response.data as { error: unknown }).error)]
-                .filter(Boolean)
-                .map(String)
-                .join(" — ")
-            : "");
-      if (!text && ax.response?.status) text = `${ax.response.status}`;
-      if (!text) text = err instanceof Error ? err.message : t("dialog.addDriver.fail.text");
       await Swal.fire({
         icon: "error",
         title: t("dialog.addDriver.fail.title"),
-        text: text || t("dialog.addDriver.fail.text")
+        text: getApiErrorMessage(err, t("dialog.addDriver.fail.text")) || t("dialog.addDriver.fail.text")
       });
       return;
     }

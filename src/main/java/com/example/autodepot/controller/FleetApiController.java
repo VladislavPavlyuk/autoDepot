@@ -102,29 +102,45 @@ public class FleetApiController {
 
     @PostMapping(value = "/drivers", consumes = {"application/json", "application/json;charset=UTF-8"})
     public ResponseEntity<Map<String, String>> createDriver(@RequestBody(required = false) byte[] rawBytes) {
+        DriverCreateDTO dto = parseDriverPayload(rawBytes);
+        String name = validateDriverName(dto.getName());
+        List<String> categories = validateAndNormalizeLicenseCategories(dto.getLicenseCategories());
+        int licenseYear = validateLicenseYear(dto.getLicenseYear());
+        Driver driver = toDriverEntity(name, licenseYear, categories);
+        driverService.save(driver);
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "created"));
+    }
+
+    private DriverCreateDTO parseDriverPayload(byte[] rawBytes) {
         String rawBody = rawBytes == null || rawBytes.length == 0
             ? null
             : new String(rawBytes, java.nio.charset.StandardCharsets.UTF_8);
         if (rawBody == null || rawBody.isBlank()) {
             throw new BadRequestException("Request body is required. Send JSON: name, licenseYear, licenseCategories (array).");
         }
-        DriverCreateDTO driverCreateDTO;
         try {
-            driverCreateDTO = OBJECT_MAPPER.readValue(rawBody, DriverCreateDTO.class);
+            DriverCreateDTO dto = OBJECT_MAPPER.readValue(rawBody, DriverCreateDTO.class);
+            if (dto == null) {
+                throw new BadRequestException("Driver payload is required");
+            }
+            return dto;
         } catch (IOException e) {
             throw new BadRequestException("Invalid JSON: " + (e.getMessage() != null ? e.getMessage() : "parse error"));
         }
-        if (driverCreateDTO == null) {
-            throw new BadRequestException("Driver payload is required");
-        }
-        String name = driverCreateDTO.getName() == null ? "" : driverCreateDTO.getName().trim();
-        if (name.isEmpty()) {
+    }
+
+    private String validateDriverName(String name) {
+        String trimmed = name == null ? "" : name.trim();
+        if (trimmed.isEmpty()) {
             throw new BadRequestException("Driver name is required");
         }
-        if (name.length() > MAX_ORDER_STRING_LENGTH) {
+        if (trimmed.length() > MAX_ORDER_STRING_LENGTH) {
             throw new BadRequestException("Driver name must be at most " + MAX_ORDER_STRING_LENGTH + " characters");
         }
-        List<String> categories = driverCreateDTO.getLicenseCategories();
+        return trimmed;
+    }
+
+    private List<String> validateAndNormalizeLicenseCategories(List<String> categories) {
         if (categories == null || categories.isEmpty()) {
             throw new BadRequestException("At least one license category (A–E) is required");
         }
@@ -138,17 +154,23 @@ public class FleetApiController {
         if (valid.isEmpty()) {
             throw new BadRequestException("Driver license categories must be one or more of A, B, C, D, E");
         }
-        Integer licenseYear = driverCreateDTO.getLicenseYear();
+        return valid;
+    }
+
+    private int validateLicenseYear(Integer licenseYear) {
         int currentYear = java.time.Year.now().getValue();
         if (licenseYear == null || licenseYear < 1970 || licenseYear > currentYear) {
             throw new BadRequestException("Driver license year must be between 1970 and current year");
         }
+        return licenseYear;
+    }
+
+    private Driver toDriverEntity(String name, int licenseYear, List<String> licenseCategories) {
         Driver driver = new Driver(name, licenseYear);
-        driver.setLicenseCategories(valid);
+        driver.setLicenseCategories(licenseCategories);
         driver.setAvailable(true);
         driver.setEarnings(0.0);
-        driverService.save(driver);
-        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "created"));
+        return driver;
     }
 
     @PostMapping("/orders")

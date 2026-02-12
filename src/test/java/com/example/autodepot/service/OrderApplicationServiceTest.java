@@ -2,6 +2,7 @@ package com.example.autodepot.service;
 
 import com.example.autodepot.dto.OrderDTO;
 import com.example.autodepot.entity.Order;
+import com.example.autodepot.exception.BadRequestException;
 import com.example.autodepot.mapper.OrderMapper;
 import com.example.autodepot.service.data.OrderService;
 import com.example.autodepot.service.impl.OrderApplicationServiceImpl;
@@ -39,29 +40,22 @@ class OrderApplicationServiceTest {
         ArgumentCaptor<Order> captor = ArgumentCaptor.forClass(Order.class);
         verify(orderService).save(captor.capture());
         Order savedOrder = captor.getValue();
-        boolean actualResult = "Berlin".equals(savedOrder.getDestination())
+        assertTrue("Berlin".equals(savedOrder.getDestination())
             && "STANDARD".equals(savedOrder.getCargoType())
-            && savedOrder.getWeight() == 1000.0;
-        boolean expectedResult = true;
-        assertEquals(expectedResult, actualResult);
+            && savedOrder.getWeight() == 1000.0);
     }
 
     @Test
-    void createOrder_WhenDtoWithNullDestination_CallsSaveWithMappedEntity() {
-        OrderDTO dto = new OrderDTO(null, "FRAGILE", 500.0);
-        Order entity = new Order();
-        entity.setDestination(null);
-        entity.setCargoType("FRAGILE");
-        entity.setWeight(500.0);
-        when(orderMapper.toEntity(dto)).thenReturn(entity);
-        when(orderService.save(any(Order.class))).thenReturn(entity);
+    void createOrder_WhenDestinationEmpty_ThrowsBadRequest() {
+        OrderDTO dto = new OrderDTO("", "FRAGILE", 500.0);
+        BadRequestException ex = assertThrows(BadRequestException.class, () -> orderApplicationService.createOrder(dto));
+        assertTrue(ex.getMessage().contains("Destination"));
+    }
 
-        orderApplicationService.createOrder(dto);
-
-        ArgumentCaptor<Order> captor = ArgumentCaptor.forClass(Order.class);
-        verify(orderService).save(captor.capture());
-        Order actualResult = captor.getValue();
-        Order expectedResult = entity;
-        assertEquals(expectedResult, actualResult);
+    @Test
+    void createOrder_WhenWeightInvalid_ThrowsBadRequest() {
+        OrderDTO dto = new OrderDTO("Berlin", "STANDARD", -1.0);
+        BadRequestException ex = assertThrows(BadRequestException.class, () -> orderApplicationService.createOrder(dto));
+        assertTrue(ex.getMessage().contains("Weight"));
     }
 }

@@ -15,17 +15,17 @@ Dispatcher dashboard for managing orders, trips, drivers, and vehicles. Supports
 
 Layered structure:
 
-- **Controllers** — HTTP handlers, work only with DTOs, delegate to services
-- **Services** — business logic, convert entities ↔ DTOs via mappers
-- **Data services** — CRUD over entities (OrderService, DriverService, TripDataService, etc.)
-- **Repositories** — JDBC access to PostgreSQL
+- **Controllers** - HTTP handlers, work only with DTOs, delegate to services
+- **Services** - business logic, convert entities ↔ DTOs via mappers
+- **Data services** - CRUD over entities (OrderService, DriverService, TripDataService, etc.)
+- **Repositories** - JDBC access to PostgreSQL
 
 Main flows:
 
-- **Orders** — create, generate random; QUEUED until trip assigned
-- **Trips** — assign (order → driver + car), complete, breakdown, request repair, confirm repair
-- **Drivers** — create, edit (name, license categories, license year)
-- **Dashboard** — stats, pending orders, active trips, driver performance, activity log
+- **Orders** - create, generate random; QUEUED until trip assigned
+- **Trips** - assign (order → driver + car), complete, breakdown, request repair, confirm repair
+- **Drivers** - create, edit (name, license categories, license year)
+- **Dashboard** - stats, pending orders, active trips, driver performance, activity log
 
 ### Frontend (React + Vite)
 
@@ -37,9 +37,9 @@ Main flows:
 
 ### Infrastructure
 
-- **Docker Compose** — postgres, backend, frontend, nginx
-- **nginx** — reverse proxy, /api and /login → backend
-- **Flyway** — DB migrations
+- **Docker Compose** - postgres, backend, frontend, nginx
+- **nginx** - reverse proxy, /api and /login → backend
+- **Flyway** - DB migrations
 
 ## Technologies
 

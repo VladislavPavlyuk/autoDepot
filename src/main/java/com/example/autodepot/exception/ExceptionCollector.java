@@ -1,13 +1,13 @@
 package com.example.autodepot.exception;
 
-import com.example.autodepot.entity.ErrorAudit;
-import com.example.autodepot.repository.ErrorAuditRepository;
+import com.example.autodepot.dto.ErrorAuditCreateDTO;
+import com.example.autodepot.service.ErrorAuditService;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 
 /**
- * Centralized exception registry. Persists to DB (audit log) and keeps in-memory snapshot for fast read.
+ * Centralized exception registry. Persists to DB via ErrorAuditService.
  */
 @Component
 public class ExceptionCollector {
@@ -16,10 +16,10 @@ public class ExceptionCollector {
     private static final int MAX_LOCATION_LEN = 512;
     private static final int MAX_EXCEPTION_TYPE_LEN = 512;
 
-    private final ErrorAuditRepository errorAuditRepository;
+    private final ErrorAuditService errorAuditService;
 
-    public ExceptionCollector(ErrorAuditRepository errorAuditRepository) {
-        this.errorAuditRepository = errorAuditRepository;
+    public ExceptionCollector(ErrorAuditService errorAuditService) {
+        this.errorAuditService = errorAuditService;
     }
 
     public void record(Throwable ex, String location) {
@@ -36,7 +36,7 @@ public class ExceptionCollector {
         if (exceptionType.length() > MAX_EXCEPTION_TYPE_LEN) {
             exceptionType = exceptionType.substring(0, MAX_EXCEPTION_TYPE_LEN);
         }
-        ErrorAudit audit = new ErrorAudit(now, threadName, location, exceptionType, message);
-        errorAuditRepository.save(audit);
+        ErrorAuditCreateDTO dto = new ErrorAuditCreateDTO(now, threadName, location, exceptionType, message);
+        errorAuditService.record(dto);
     }
 }

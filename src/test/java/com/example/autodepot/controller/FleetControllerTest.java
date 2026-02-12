@@ -3,10 +3,7 @@ package com.example.autodepot.controller;
 import com.example.autodepot.dto.OrderDTO;
 import com.example.autodepot.dto.StatsSummaryDTO;
 import com.example.autodepot.dto.TripAssignDTO;
-import com.example.autodepot.dto.TripBreakdownDTO;
 import com.example.autodepot.dto.TripCompleteDTO;
-import com.example.autodepot.dto.TripRepairDTO;
-import com.example.autodepot.mapper.TripCommandMapper;
 import com.example.autodepot.service.FleetDashboardService;
 import com.example.autodepot.service.OrderApplicationService;
 import com.example.autodepot.service.OrderGenerationService;
@@ -29,7 +26,6 @@ class FleetControllerTest {
     private FleetDashboardService fleetDashboardService;
     private OrderApplicationService orderApplicationService;
     private OrderGenerationService orderGenerationService;
-    private TripCommandMapper tripCommandMapper;
 
     @BeforeEach
     void setUp() {
@@ -38,10 +34,9 @@ class FleetControllerTest {
         fleetDashboardService = mock(FleetDashboardService.class);
         orderApplicationService = mock(OrderApplicationService.class);
         orderGenerationService = mock(OrderGenerationService.class);
-        tripCommandMapper = mock(TripCommandMapper.class);
 
         fleetController = new FleetController(
-            tripService, statsService, fleetDashboardService, orderApplicationService, orderGenerationService, tripCommandMapper
+            tripService, statsService, fleetDashboardService, orderApplicationService, orderGenerationService
         );
     }
 
@@ -109,41 +104,29 @@ class FleetControllerTest {
 
     @Test
     void reportBreakdown_WhenTripIdProvided_ReturnsRedirectToDashboard() {
-        TripBreakdownDTO breakdownDTO = new TripBreakdownDTO();
-        breakdownDTO.setTripId(1L);
-        when(tripCommandMapper.toBreakdownDto(1L)).thenReturn(breakdownDTO);
-
         String actualResult = fleetController.reportBreakdown(1L);
         String expectedResult = "redirect:/fleet/dashboard";
 
         assertEquals(expectedResult, actualResult);
-        verify(tripService, times(1)).processBreakdown(argThat(dto -> dto.getTripId().equals(1L)));
+        verify(tripService, times(1)).processBreakdown(1L);
     }
 
     @Test
     void requestRepair_WhenTripIdProvided_ReturnsRedirectToDashboard() {
-        TripRepairDTO repairDTO = new TripRepairDTO();
-        repairDTO.setTripId(1L);
-        when(tripCommandMapper.toRepairDto(1L)).thenReturn(repairDTO);
-
         String actualResult = fleetController.requestRepair(1L);
         String expectedResult = "redirect:/fleet/dashboard";
 
         assertEquals(expectedResult, actualResult);
-        verify(tripService, times(1)).requestRepair(argThat(dto -> dto.getTripId().equals(1L)));
+        verify(tripService, times(1)).requestRepair(1L);
     }
 
     @Test
     void confirmRepairComplete_WhenTripIdProvided_ReturnsRedirectToDashboard() {
-        TripRepairDTO repairDTO = new TripRepairDTO();
-        repairDTO.setTripId(1L);
-        when(tripCommandMapper.toRepairDto(1L)).thenReturn(repairDTO);
-
         String actualResult = fleetController.confirmRepairComplete(1L);
         String expectedResult = "redirect:/fleet/dashboard";
 
         assertEquals(expectedResult, actualResult);
-        verify(tripService, times(1)).confirmRepairComplete(argThat(dto -> dto.getTripId().equals(1L)));
+        verify(tripService, times(1)).confirmRepairComplete(1L);
     }
 
     @Test

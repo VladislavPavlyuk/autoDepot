@@ -110,6 +110,12 @@ public class TripServiceImpl implements TripService {
 
     @Override
     @Transactional
+    public void processBreakdown(Long tripId) {
+        processBreakdown(tripCommandMapper.toBreakdownDto(tripId));
+    }
+
+    @Override
+    @Transactional
     public void requestRepair(TripRepairDTO repairDTO) {
         TripRepairCommand command = tripCommandMapper.toCommand(repairDTO);
         Trip trip = tripDataService.findById(command.getTripId())
@@ -123,6 +129,12 @@ public class TripServiceImpl implements TripService {
         tripDataService.save(trip);
 
         tripEventLogger.logEvent("REPAIR_REQUESTED", trip);
+    }
+
+    @Override
+    @Transactional
+    public void requestRepair(Long tripId) {
+        requestRepair(tripCommandMapper.toRepairDto(tripId));
     }
 
     @Override
@@ -144,6 +156,12 @@ public class TripServiceImpl implements TripService {
         tripDataService.save(trip);
 
         tripEventLogger.logEvent("REPAIR_COMPLETED", trip);
+    }
+
+    @Override
+    @Transactional
+    public void confirmRepairComplete(Long tripId) {
+        confirmRepairComplete(tripCommandMapper.toRepairDto(tripId));
     }
 
     @Override

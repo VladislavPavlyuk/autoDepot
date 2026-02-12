@@ -325,4 +325,27 @@ class TripServiceTest {
         verify(tripDataService).save(tripCaptor.capture());
         assertEquals(Trip.TripStatus.IN_PROGRESS, tripCaptor.getValue().getStatus());
     }
+
+    @Test
+    void processBreakdown_WhenTripIdProvided_DelegatesToDtoMethod() {
+        Trip trip = new Trip(testOrder, testDriver, testCar);
+        trip.setId(1L);
+        trip.setStatus(Trip.TripStatus.IN_PROGRESS);
+
+        when(tripDataService.findById(1L)).thenReturn(Optional.of(trip));
+        when(tripDataService.save(any(Trip.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(carService.save(any(Car.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        TripBreakdownDTO dto = new TripBreakdownDTO();
+        dto.setTripId(1L);
+        when(tripCommandMapper.toBreakdownDto(1L)).thenReturn(dto);
+        TripBreakdownCommand command = new TripBreakdownCommand();
+        command.setTripId(1L);
+        when(tripCommandMapper.toCommand(dto)).thenReturn(command);
+
+        tripService.processBreakdown(1L);
+
+        verify(tripCommandMapper).toBreakdownDto(1L);
+        verify(tripDataService).save(any(Trip.class));
+    }
 }

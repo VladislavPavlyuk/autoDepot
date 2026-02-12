@@ -11,9 +11,15 @@ public interface TripService {
 
     void processBreakdown(TripBreakdownDTO breakdownDTO);
 
+    void processBreakdown(Long tripId);
+
     void requestRepair(TripRepairDTO repairDTO);
 
+    void requestRepair(Long tripId);
+
     void confirmRepairComplete(TripRepairDTO repairDTO);
+
+    void confirmRepairComplete(Long tripId);
 
     void completeTrip(TripCompleteDTO completeDTO);
 

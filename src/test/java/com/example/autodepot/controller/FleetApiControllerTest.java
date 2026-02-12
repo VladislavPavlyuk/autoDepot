@@ -8,7 +8,6 @@ import com.example.autodepot.service.DriverApplicationService;
 import com.example.autodepot.service.OrderApplicationService;
 import com.example.autodepot.service.OrderGenerationService;
 import com.example.autodepot.service.TripService;
-import com.example.autodepot.mapper.TripCommandMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -28,7 +27,6 @@ class FleetApiControllerTest {
     private OrderApplicationService orderApplicationService;
     private OrderGenerationService orderGenerationService;
     private TripService tripService;
-    private TripCommandMapper tripCommandMapper;
 
     @BeforeEach
     void setUp() {
@@ -37,10 +35,9 @@ class FleetApiControllerTest {
         orderApplicationService = mock(OrderApplicationService.class);
         orderGenerationService = mock(OrderGenerationService.class);
         tripService = mock(TripService.class);
-        tripCommandMapper = mock(TripCommandMapper.class);
         controller = new FleetApiController(
             tripService, dashboardApiService, orderApplicationService,
-            orderGenerationService, tripCommandMapper, driverApplicationService
+            orderGenerationService, driverApplicationService
         );
     }
 

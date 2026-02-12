@@ -3,10 +3,7 @@ package com.example.autodepot.controller;
 import com.example.autodepot.dto.OrderDTO;
 import com.example.autodepot.dto.StatsSummaryDTO;
 import com.example.autodepot.dto.TripAssignDTO;
-import com.example.autodepot.dto.TripBreakdownDTO;
 import com.example.autodepot.dto.TripCompleteDTO;
-import com.example.autodepot.dto.TripRepairDTO;
-import com.example.autodepot.mapper.TripCommandMapper;
 import com.example.autodepot.service.FleetDashboardService;
 import com.example.autodepot.service.OrderApplicationService;
 import com.example.autodepot.service.OrderGenerationService;
@@ -24,19 +21,16 @@ public class FleetController {
     private final FleetDashboardService fleetDashboardService;
     private final OrderApplicationService orderApplicationService;
     private final OrderGenerationService orderGenerationService;
-    private final TripCommandMapper tripCommandMapper;
 
-    public FleetController(TripService tripService, StatsService statsService, 
+    public FleetController(TripService tripService, StatsService statsService,
                            FleetDashboardService fleetDashboardService,
                            OrderApplicationService orderApplicationService,
-                           OrderGenerationService orderGenerationService,
-                           TripCommandMapper tripCommandMapper) {
+                           OrderGenerationService orderGenerationService) {
         this.tripService = tripService;
         this.statsService = statsService;
         this.fleetDashboardService = fleetDashboardService;
         this.orderApplicationService = orderApplicationService;
         this.orderGenerationService = orderGenerationService;
-        this.tripCommandMapper = tripCommandMapper;
     }
 
     @GetMapping("/dashboard")
@@ -80,22 +74,19 @@ public class FleetController {
 
     @PostMapping("/trips/{tripId}/breakdown")
     public String reportBreakdown(@PathVariable Long tripId) {
-        TripBreakdownDTO breakdownDTO = tripCommandMapper.toBreakdownDto(tripId);
-        tripService.processBreakdown(breakdownDTO);
+        tripService.processBreakdown(tripId);
         return "redirect:/fleet/dashboard";
     }
 
     @PostMapping("/trips/{tripId}/repair")
     public String requestRepair(@PathVariable Long tripId) {
-        TripRepairDTO repairDTO = tripCommandMapper.toRepairDto(tripId);
-        tripService.requestRepair(repairDTO);
+        tripService.requestRepair(tripId);
         return "redirect:/fleet/dashboard";
     }
 
     @PostMapping("/trips/{tripId}/repair-complete")
     public String confirmRepairComplete(@PathVariable Long tripId) {
-        TripRepairDTO repairDTO = tripCommandMapper.toRepairDto(tripId);
-        tripService.confirmRepairComplete(repairDTO);
+        tripService.confirmRepairComplete(tripId);
         return "redirect:/fleet/dashboard";
     }
 

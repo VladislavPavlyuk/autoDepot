@@ -31,7 +31,7 @@ public class SecurityConfig {
             )
             .formLogin(form -> form
                 .loginPage("/login")
-                .defaultSuccessUrl("/", true)
+                .defaultSuccessUrl("/fleet/dashboard", true)
                 .permitAll()
             )
             .logout(logout -> logout

@@ -88,6 +88,10 @@ export const requestRepair = async (tripId: number): Promise<void> => {
   await client.post(`/trips/${tripId}/repair`);
 };
 
+export const confirmRepairComplete = async (tripId: number): Promise<void> => {
+  await client.post(`/trips/${tripId}/repair-complete`);
+};
+
 export const simulateBreakdown = async (): Promise<void> => {
   await client.post("/trips/simulate-breakdown");
 };

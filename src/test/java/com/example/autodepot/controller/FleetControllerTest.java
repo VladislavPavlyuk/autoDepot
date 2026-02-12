@@ -134,6 +134,19 @@ class FleetControllerTest {
     }
 
     @Test
+    void confirmRepairComplete_WhenTripIdProvided_ReturnsRedirectToDashboard() {
+        TripRepairDTO repairDTO = new TripRepairDTO();
+        repairDTO.setTripId(1L);
+        when(tripCommandMapper.toRepairDto(1L)).thenReturn(repairDTO);
+
+        String actualResult = fleetController.confirmRepairComplete(1L);
+        String expectedResult = "redirect:/fleet/dashboard";
+
+        assertEquals(expectedResult, actualResult);
+        verify(tripService, times(1)).confirmRepairComplete(argThat(dto -> dto.getTripId().equals(1L)));
+    }
+
+    @Test
     void simulateBreakdown_WhenCalled_ReturnsRedirectToDashboard() {
         String actualResult = fleetController.simulateBreakdown();
         String expectedResult = "redirect:/fleet/dashboard";

@@ -105,6 +105,13 @@ public class FleetApiController {
         tripService.requestRepair(repairDTO);
     }
 
+    @PostMapping("/trips/{tripId}/repair-complete")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void confirmRepairComplete(@PathVariable Long tripId) {
+        TripRepairDTO repairDTO = tripCommandMapper.toRepairDto(tripId);
+        tripService.confirmRepairComplete(repairDTO);
+    }
+
     @PostMapping("/trips/simulate-breakdown")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void simulateBreakdown() {

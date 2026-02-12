@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.any;
@@ -294,5 +295,34 @@ class TripServiceTest {
         boolean actualResult = savedTrip.getStatus() == Trip.TripStatus.REPAIR_REQUESTED;
         boolean expectedResult = true;
         assertEquals(expectedResult, actualResult);
+    }
+
+    @Test
+    void confirmRepairComplete_WhenTripRepairRequested_SetsInProgressAndCarFixed() {
+        Car car = new Car(1000.0);
+        car.setId(1L);
+        car.setBroken(true);
+        Trip trip = new Trip(testOrder, testDriver, car);
+        trip.setId(1L);
+        trip.setStatus(Trip.TripStatus.REPAIR_REQUESTED);
+
+        when(tripDataService.findById(1L)).thenReturn(Optional.of(trip));
+        when(tripDataService.save(any(Trip.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(carService.save(any(Car.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        TripRepairDTO repairDTO = new TripRepairDTO();
+        repairDTO.setTripId(1L);
+        TripRepairCommand repairCommand = new TripRepairCommand();
+        repairCommand.setTripId(1L);
+        when(tripCommandMapper.toCommand(repairDTO)).thenReturn(repairCommand);
+        tripService.confirmRepairComplete(repairDTO);
+
+        ArgumentCaptor<Car> carCaptor = ArgumentCaptor.forClass(Car.class);
+        verify(carService).save(carCaptor.capture());
+        assertFalse(carCaptor.getValue().isBroken());
+
+        ArgumentCaptor<Trip> tripCaptor = ArgumentCaptor.forClass(Trip.class);
+        verify(tripDataService).save(tripCaptor.capture());
+        assertEquals(Trip.TripStatus.IN_PROGRESS, tripCaptor.getValue().getStatus());
     }
 }

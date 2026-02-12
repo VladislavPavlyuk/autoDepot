@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import Swal from "sweetalert2";
-import { completeTrip, reportBreakdown, requestRepair } from "../api/dashboardApi";
+import { completeTrip, confirmRepairComplete, reportBreakdown, requestRepair } from "../api/dashboardApi";
 import { TripRow, TripStatus } from "../types/dashboard";
 import { useI18n } from "../i18n";
 import { getApiErrorMessage } from "../utils/dialogs";
@@ -113,6 +113,29 @@ const TripsTable = ({ trips, onSuccess }: TripsTableProps) => {
     }
   });
 
+  const confirmRepairMutation = useMutation({
+    mutationFn: confirmRepairComplete,
+    onSuccess: async () => {
+      await Swal.fire({
+        icon: "success",
+        title: t("dialog.repairComplete.title"),
+        text: t("dialog.repairComplete.text"),
+        timer: 1600,
+        showConfirmButton: false
+      });
+      try {
+        await onSuccess?.();
+      } catch {}
+    },
+    onError: async (error) => {
+      await Swal.fire({
+        icon: "error",
+        title: t("dialog.repairCompleteFail.title"),
+        text: getApiErrorMessage(error, t("dialog.repairCompleteFail.text"))
+      });
+    }
+  });
+
   const handleComplete = async (trip: TripRow) => {
     if (!trip.tripId) {
       await Swal.fire({
@@ -160,6 +183,18 @@ const TripsTable = ({ trips, onSuccess }: TripsTableProps) => {
       return;
     }
     repairMutation.mutate(trip.tripId);
+  };
+
+  const handleConfirmRepair = async (trip: TripRow) => {
+    if (!trip.tripId) {
+      await Swal.fire({
+        icon: "warning",
+        title: t("dialog.tripIdMissing.title"),
+        text: t("dialog.tripIdMissing.repairComplete")
+      });
+      return;
+    }
+    confirmRepairMutation.mutate(trip.tripId);
   };
 
   const visibleTrips =
@@ -213,6 +248,11 @@ const TripsTable = ({ trips, onSuccess }: TripsTableProps) => {
                 {trip.status === "BROKEN" && (
                   <button className="button ghost tiny" onClick={() => handleRepair(trip)}>
                     {t("trips.repair")}
+                  </button>
+                )}
+                {trip.status === "REPAIR_REQUESTED" && (
+                  <button className="button ghost tiny" onClick={() => handleConfirmRepair(trip)}>
+                    {t("trips.confirmRepair")}
                   </button>
                 )}
               </div>

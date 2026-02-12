@@ -92,6 +92,13 @@ public class FleetController {
         return "redirect:/fleet/dashboard";
     }
 
+    @PostMapping("/trips/{tripId}/repair-complete")
+    public String confirmRepairComplete(@PathVariable Long tripId) {
+        TripRepairDTO repairDTO = tripCommandMapper.toRepairDto(tripId);
+        tripService.confirmRepairComplete(repairDTO);
+        return "redirect:/fleet/dashboard";
+    }
+
     @PostMapping("/trips/simulate-breakdown")
     public String simulateBreakdown() {
         tripService.simulateRandomBreakdown();

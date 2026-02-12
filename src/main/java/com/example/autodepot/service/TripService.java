@@ -13,6 +13,8 @@ public interface TripService {
 
     void requestRepair(TripRepairDTO repairDTO);
 
+    void confirmRepairComplete(TripRepairDTO repairDTO);
+
     void completeTrip(TripCompleteDTO completeDTO);
 
     void simulateRandomBreakdown();

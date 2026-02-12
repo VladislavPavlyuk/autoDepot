@@ -315,6 +315,11 @@
                                     <button type="submit" class="btn btn-warning">Request Repair</button>
                                 </form>
                             </div>
+                            <div th:if="${trip.status == 'REPAIR_REQUESTED'}">
+                                <form th:action="@{'/fleet/trips/' + ${trip.id} + '/repair-complete'}" method="post" style="display: inline;">
+                                    <button type="submit" class="btn btn-success">Confirm Repair</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 </tbody>

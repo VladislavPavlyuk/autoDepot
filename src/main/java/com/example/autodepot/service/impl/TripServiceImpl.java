@@ -127,6 +127,27 @@ public class TripServiceImpl implements TripService {
 
     @Override
     @Transactional
+    public void confirmRepairComplete(TripRepairDTO repairDTO) {
+        TripRepairCommand command = tripCommandMapper.toCommand(repairDTO);
+        Trip trip = tripDataService.findById(command.getTripId())
+            .orElseThrow(() -> new NotFoundException("Trip not found: " + command.getTripId()));
+
+        if (trip.getStatus() != Trip.TripStatus.REPAIR_REQUESTED) {
+            throw new BadRequestException("Trip is not awaiting repair completion");
+        }
+
+        Car car = trip.getCar();
+        car.setBroken(false);
+        carService.save(car);
+
+        trip.setStatus(Trip.TripStatus.IN_PROGRESS);
+        tripDataService.save(trip);
+
+        tripEventLogger.logEvent("REPAIR_COMPLETED", trip);
+    }
+
+    @Override
+    @Transactional
     public void completeTrip(TripCompleteDTO completeDTO) {
         TripCompleteCommand command = tripCommandMapper.toCommand(completeDTO);
         Trip trip = tripDataService.findById(command.getTripId())

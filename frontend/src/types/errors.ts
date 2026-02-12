@@ -1,6 +1,6 @@
 export type ErrorAuditEntry = {
   id: number;
-  createdAt: string;
+  createdAt: string | number;
   threadName: string | null;
   location: string | null;
   exceptionType: string;

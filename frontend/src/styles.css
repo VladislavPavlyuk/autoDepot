@@ -519,6 +519,11 @@ body {
   min-width: 180px;
 }
 
+.errors-since-hint {
+  font-size: 11px;
+  color: var(--muted);
+}
+
 .errors-panel-error {
   padding: 12px 20px;
   color: #f87171;

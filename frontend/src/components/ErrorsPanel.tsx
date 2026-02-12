@@ -7,12 +7,11 @@ type ErrorsPanelProps = {
   onClose: () => void;
 };
 
+/** UTC ms or ISO string → local date/time */
 function formatDate(isoOrMillis: string | number): string {
-  if (typeof isoOrMillis === "number") {
-    return new Date(isoOrMillis).toLocaleString();
-  }
-  const d = new Date(isoOrMillis);
-  return Number.isNaN(d.getTime()) ? String(isoOrMillis) : d.toLocaleString();
+  const ms = typeof isoOrMillis === "number" ? isoOrMillis : new Date(isoOrMillis).getTime();
+  if (Number.isNaN(ms)) return String(isoOrMillis);
+  return new Date(ms).toLocaleString(undefined, { dateStyle: "short", timeStyle: "medium" });
 }
 
 export default function ErrorsPanel({ policy, onClose }: ErrorsPanelProps) {
@@ -93,6 +92,9 @@ export default function ErrorsPanel({ policy, onClose }: ErrorsPanelProps) {
             onChange={(e) => setSinceEpoch(e.target.value ? Number(e.target.value) : null)}
             placeholder="optional"
           />
+          {sinceEpoch != null && (
+            <span className="errors-since-hint"> = {formatDate(sinceEpoch)}</span>
+          )}
         </label>
         <label>
           Exception type

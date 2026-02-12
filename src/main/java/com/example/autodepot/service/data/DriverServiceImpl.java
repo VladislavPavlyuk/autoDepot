@@ -26,6 +26,11 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
+    public java.util.Optional<Driver> findById(Long id) {
+        return driverRepository.findById(id);
+    }
+
+    @Override
     public long count() {
         return driverRepository.count();
     }

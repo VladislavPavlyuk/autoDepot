@@ -126,7 +126,9 @@ public class DashboardApiServiceImpl implements DashboardApiService {
         List<DriverPerformanceDTO> merged = new ArrayList<>();
         for (Driver driver : drivers) {
             DriverPerformanceDTO dto = new DriverPerformanceDTO();
+            dto.setDriverId(driver.getId());
             dto.setDriverName(driver.getName());
+            dto.setLicenseYear(driver.getLicenseYear());
             DriverPerformanceDTO existing = statsByName.get(driver.getName());
             dto.setTripCount(existing == null ? 0L : existing.getTripCount());
             dto.setTotalWeight(existing == null ? 0.0 : existing.getTotalWeight());

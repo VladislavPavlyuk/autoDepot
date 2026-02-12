@@ -6,6 +6,8 @@ public interface DriverApplicationService {
 
     void createDriver(DriverCreateDTO dto);
 
+    void updateDriver(Long id, DriverCreateDTO dto);
+
     /** Parses raw JSON body to DriverCreateDTO. Throws BadRequestException on invalid input. */
     DriverCreateDTO parseDriverPayload(byte[] rawBytes);
 }

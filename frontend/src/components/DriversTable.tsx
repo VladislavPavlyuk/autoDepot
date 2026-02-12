@@ -52,7 +52,7 @@ const DriversTable = ({ drivers, onAddDriver, onEditDriver }: DriversTableProps)
           <div key={driver.driverId ?? driver.driverName} className="table-row drivers">
             <span>{driver.driverName}</span>
             <span>{(driver.licenseCategories ?? []).join(", ")}</span>
-            <span>{driver.experience}</span>
+            <span>{driver.experience ?? (driver.licenseYear != null ? new Date().getFullYear() - driver.licenseYear : "—")}</span>
             <span>{driver.tripCount}</span>
             <span>{formatWeight(driver.totalWeight)}</span>
             <span>{formatMoney(driver.earnings)}</span>

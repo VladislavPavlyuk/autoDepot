@@ -73,22 +73,6 @@ public class DriverApplicationServiceImpl implements DriverApplicationService {
         driverService.save(driver);
     }
 
-    @Override
-    public void updateDriver(Long id, DriverCreateDTO dto) {
-        if (dto == null) {
-            throw new BadRequestException("Driver payload is required");
-        }
-        Driver driver = driverService.findById(id)
-            .orElseThrow(() -> new NotFoundException("Driver not found: " + id));
-        String name = validateDriverName(dto.getName());
-        List<String> categories = validateAndNormalizeLicenseCategories(dto.getLicenseCategories());
-        int licenseYear = validateLicenseYear(dto.getLicenseYear());
-        driver.setName(name);
-        driver.setLicenseYear(licenseYear);
-        driver.setLicenseCategories(categories);
-        driverService.save(driver);
-    }
-
     private String validateDriverName(String name) {
         String trimmed = name == null ? "" : name.trim();
         if (trimmed.isEmpty()) {

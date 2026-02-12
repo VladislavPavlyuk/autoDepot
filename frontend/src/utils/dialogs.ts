@@ -144,10 +144,14 @@ export function buildAddDriverHtml(t: (key: string) => string, nowYear: number):
       <p style="margin:0 0 8px; font-size: 0.9em; color: var(--muted);">${escapeHtml(t("dialog.addDriver.licenseCategory"))}</p>
       ${categories.map((cat) => `<label style="display:inline-block; margin-right: 1rem;"><input type="checkbox" name="driver-cat" value="${cat}"> ${cat}</label>`).join("")}
     </div>` +
-    `<select id="driver-license-year" class="swal2-select">
-      <option value="">${escapeHtml(t("dialog.addDriver.selectYear"))}</option>
-      ${yearOptions.map((y) => `<option value="${y}">${y}</option>`).join("")}
-    </select>`
+    `<div style="margin-top:0.5rem;">
+      <p style="margin:0 0 4px; font-size: 0.9em; color: var(--muted);">${escapeHtml(t("dialog.addDriver.licenseYear"))}</p>
+      <p style="margin:0 0 6px; font-size: 0.8em; color: var(--muted);">${escapeHtml(t("dialog.addDriver.licenseYearHint"))}</p>
+      <select id="driver-license-year" class="swal2-select">
+        <option value="">${escapeHtml(t("dialog.addDriver.selectYear"))}</option>
+        ${yearOptions.map((y) => `<option value="${y}">${y}</option>`).join("")}
+      </select>
+    </div>`
   );
 }
 
@@ -166,9 +170,13 @@ export function buildEditDriverHtml(
       <p style="margin:0 0 8px; font-size: 0.9em; color: var(--muted);">${escapeHtml(t("dialog.addDriver.licenseCategory"))}</p>
       ${categories.map((cat) => `<label style="display:inline-block; margin-right: 1rem;"><input type="checkbox" name="driver-cat" value="${cat}" ${selectedCats.has(cat) ? "checked" : ""}> ${cat}</label>`).join("")}
     </div>` +
-    `<select id="driver-license-year" class="swal2-select">
-      <option value="">${escapeHtml(t("dialog.addDriver.selectYear"))}</option>
-      ${yearOptions.map((y) => `<option value="${y}" ${y === String(licenseYear) ? "selected" : ""}>${y}</option>`).join("")}
-    </select>`
+    `<div style="margin-top:0.5rem;">
+      <p style="margin:0 0 4px; font-size: 0.9em; color: var(--muted);">${escapeHtml(t("dialog.addDriver.licenseYear"))}</p>
+      <p style="margin:0 0 6px; font-size: 0.8em; color: var(--muted);">${escapeHtml(t("dialog.addDriver.licenseYearHint"))}</p>
+      <select id="driver-license-year" class="swal2-select">
+        <option value="">${escapeHtml(t("dialog.addDriver.selectYear"))}</option>
+        ${yearOptions.map((y) => `<option value="${y}" ${y === String(licenseYear) ? "selected" : ""}>${y}</option>`).join("")}
+      </select>
+    </div>`
   );
 }

@@ -14,6 +14,8 @@ import com.example.autodepot.service.command.TripAssignCommand;
 import com.example.autodepot.service.command.TripBreakdownCommand;
 import com.example.autodepot.service.command.TripCompleteCommand;
 import com.example.autodepot.service.command.TripRepairCommand;
+import com.example.autodepot.exception.BadRequestException;
+import com.example.autodepot.exception.NotFoundException;
 import com.example.autodepot.service.data.CarService;
 import com.example.autodepot.service.data.DriverService;
 import com.example.autodepot.service.data.OrderService;
@@ -69,15 +71,15 @@ public class TripServiceImpl implements TripService {
     public void createTrip(TripAssignDTO assignDTO) {
         TripAssignCommand command = tripCommandMapper.toCommand(assignDTO);
         Order order = orderService.findById(command.getOrderId())
-            .orElseThrow(() -> new RuntimeException("Order not found: " + command.getOrderId()));
+            .orElseThrow(() -> new NotFoundException("Order not found: " + command.getOrderId()));
 
         List<Driver> availableDrivers = driverService.findAvailableDrivers();
         Driver driver = driverSelectionPolicy.selectDriver(order, availableDrivers)
-            .orElseThrow(() -> new RuntimeException("No available drivers for order: " + command.getOrderId()));
+            .orElseThrow(() -> new NotFoundException("No available drivers for order: " + command.getOrderId()));
 
         List<Car> availableCars = carService.findAvailableCars();
         Car car = carSelectionPolicy.selectCar(order, availableCars)
-            .orElseThrow(() -> new RuntimeException("No car with sufficient capacity"));
+            .orElseThrow(() -> new NotFoundException("No car with sufficient capacity"));
 
         Trip trip = new Trip(order, driver, car);
         trip.setStatus(Trip.TripStatus.IN_PROGRESS);
@@ -94,7 +96,7 @@ public class TripServiceImpl implements TripService {
     public void processBreakdown(TripBreakdownDTO breakdownDTO) {
         TripBreakdownCommand command = tripCommandMapper.toCommand(breakdownDTO);
         Trip trip = tripDataService.findById(command.getTripId())
-            .orElseThrow(() -> new RuntimeException("Trip not found: " + command.getTripId()));
+            .orElseThrow(() -> new NotFoundException("Trip not found: " + command.getTripId()));
 
         Car car = trip.getCar();
         car.setBroken(true);
@@ -111,10 +113,10 @@ public class TripServiceImpl implements TripService {
     public void requestRepair(TripRepairDTO repairDTO) {
         TripRepairCommand command = tripCommandMapper.toCommand(repairDTO);
         Trip trip = tripDataService.findById(command.getTripId())
-            .orElseThrow(() -> new RuntimeException("Trip not found: " + command.getTripId()));
+            .orElseThrow(() -> new NotFoundException("Trip not found: " + command.getTripId()));
 
         if (trip.getStatus() != Trip.TripStatus.BROKEN) {
-            throw new RuntimeException("Trip is not broken");
+            throw new BadRequestException("Trip is not broken");
         }
 
         trip.setStatus(Trip.TripStatus.REPAIR_REQUESTED);
@@ -128,10 +130,10 @@ public class TripServiceImpl implements TripService {
     public void completeTrip(TripCompleteDTO completeDTO) {
         TripCompleteCommand command = tripCommandMapper.toCommand(completeDTO);
         Trip trip = tripDataService.findById(command.getTripId())
-            .orElseThrow(() -> new RuntimeException("Trip not found: " + command.getTripId()));
+            .orElseThrow(() -> new NotFoundException("Trip not found: " + command.getTripId()));
 
         if (trip.getStatus() != Trip.TripStatus.IN_PROGRESS) {
-            throw new RuntimeException("Trip is not in progress");
+            throw new BadRequestException("Trip is not in progress");
         }
 
         double payment = paymentCalculator.calculatePayment(trip.getOrder());

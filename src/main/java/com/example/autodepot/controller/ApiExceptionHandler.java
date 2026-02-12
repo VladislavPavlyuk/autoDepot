@@ -2,6 +2,7 @@ package com.example.autodepot.controller;
 
 import com.example.autodepot.exception.BadRequestException;
 import com.example.autodepot.exception.ExceptionCollector;
+import com.example.autodepot.exception.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,16 @@ public class ApiExceptionHandler {
 
     public ApiExceptionHandler(ExceptionCollector exceptionCollector) {
         this.exceptionCollector = exceptionCollector;
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleNotFound(NotFoundException ex) {
+        exceptionCollector.record(ex, "ApiExceptionHandler.handleNotFound");
+        String message = ex.getMessage() != null ? ex.getMessage() : "Not found";
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(Map.of("message", message));
     }
 
     @ExceptionHandler(BadRequestException.class)

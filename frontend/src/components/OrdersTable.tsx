@@ -4,10 +4,11 @@ import Swal from "sweetalert2";
 import { assignTrip } from "../api/dashboardApi";
 import { OrderRow, OrderStatus } from "../types/dashboard";
 import { useI18n } from "../i18n";
+import { getApiErrorMessage } from "../utils/dialogs";
 
 type OrdersTableProps = {
   orders: OrderRow[];
-  onSuccess?: () => void;
+  onSuccess?: () => void | Promise<unknown>;
 };
 
 const statusClass = (status: OrderRow["status"]) => {
@@ -51,13 +52,15 @@ const OrdersTable = ({ orders, onSuccess }: OrdersTableProps) => {
         timer: 1600,
         showConfirmButton: false
       });
-      onSuccess?.();
+      try {
+        await onSuccess?.();
+      } catch {}
     },
     onError: async (error) => {
       await Swal.fire({
         icon: "error",
         title: t("dialog.assignFail.title"),
-        text: error instanceof Error ? error.message : t("dialog.assignFail.text")
+        text: getApiErrorMessage(error, t("dialog.assignFail.text"))
       });
     }
   });

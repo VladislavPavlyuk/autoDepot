@@ -1,6 +1,8 @@
 package com.example.autodepot.entity;
 
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
@@ -9,6 +11,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class Driver {
+    @Getter(AccessLevel.NONE)
     private Long id;
     private String name;
     private Integer licenseYear;
@@ -29,5 +32,9 @@ public class Driver {
 
     public void addEarnings(double amount) {
         this.earnings += amount;
+    }
+
+    public Long getId() {
+        return id;
     }
 }

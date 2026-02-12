@@ -25,13 +25,13 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/fleet/**", "/api/errors", "/api/errors/**").authenticated()
-                .requestMatchers("/login", "/").permitAll()
-                .anyRequest().permitAll()
+                .requestMatchers("/login", "/", "/error", "/commodore.png", "/favicon.ico", "/static/**", "/css/**", "/js/**").permitAll()
+                .requestMatchers("/fleet/**", "/api/**").authenticated()
+                .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/login")
-                .defaultSuccessUrl("/fleet/dashboard", true)
+                .defaultSuccessUrl("/", true)
                 .permitAll()
             )
             .logout(logout -> logout

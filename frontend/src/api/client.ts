@@ -2,7 +2,8 @@ import axios from "axios";
 
 const client = axios.create({
   baseURL: "/api",
-  timeout: 15_000
+  timeout: 15_000,
+  withCredentials: true
 });
 
 function getMessageFromResponse(data: unknown): string | null {
@@ -27,6 +28,10 @@ client.interceptors.response.use(
   (err) => {
     const msg = getMessageFromResponse(err.response?.data) ?? err.message;
     (err as Error & { serverMessage?: string }).serverMessage = msg;
+    if (err.response?.status === 401) {
+      window.location.href = "/login";
+      return Promise.reject(err);
+    }
     return Promise.reject(err);
   }
 );

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,12 +39,19 @@ public class TripRepositoryImpl implements TripRepository {
     public Optional<Trip> findById(Long id) {
         List<Trip> list = jdbcTemplate.query(TRIP_JOIN + " WHERE t.id = ?",
             (rs, rowNum) -> mapTrip(rs), id);
-        return list.isEmpty() ? Optional.empty() : Optional.of(list.get(0));
+        if (list.isEmpty()) return Optional.empty();
+        Trip trip = list.get(0);
+        trip.getDriver().setLicenseCategories(loadLicenseCategories(trip.getDriver().getId()));
+        return Optional.of(trip);
     }
 
     @Override
     public List<Trip> findAll() {
-        return jdbcTemplate.query(TRIP_JOIN + " ORDER BY t.id", (rs, rowNum) -> mapTrip(rs));
+        List<Trip> trips = jdbcTemplate.query(TRIP_JOIN + " ORDER BY t.id", (rs, rowNum) -> mapTrip(rs));
+        for (Trip trip : trips) {
+            trip.getDriver().setLicenseCategories(loadLicenseCategories(trip.getDriver().getId()));
+        }
+        return trips;
     }
 
     @Override
@@ -140,5 +148,12 @@ public class TripRepositoryImpl implements TripRepository {
 
     private static LocalDateTime toLocalDateTime(Timestamp ts) {
         return ts != null ? ts.toLocalDateTime() : null;
+    }
+
+    private List<String> loadLicenseCategories(Long driverId) {
+        List<String> cats = jdbcTemplate.query(
+            "SELECT category FROM driver_license_categories WHERE driver_id = ? ORDER BY category",
+            (rs, rowNum) -> rs.getString("category"), driverId);
+        return cats != null ? cats : new ArrayList<>();
     }
 }

@@ -4,10 +4,11 @@ import Swal from "sweetalert2";
 import { completeTrip, reportBreakdown, requestRepair } from "../api/dashboardApi";
 import { TripRow, TripStatus } from "../types/dashboard";
 import { useI18n } from "../i18n";
+import { getApiErrorMessage } from "../utils/dialogs";
 
 type TripsTableProps = {
   trips: TripRow[];
-  onSuccess?: () => void;
+  onSuccess?: () => void | Promise<unknown>;
 };
 
 const statusClass = (status: TripRow["status"]) => {
@@ -53,13 +54,15 @@ const TripsTable = ({ trips, onSuccess }: TripsTableProps) => {
         timer: 1600,
         showConfirmButton: false
       });
-      onSuccess?.();
+      try {
+        await onSuccess?.();
+      } catch {}
     },
     onError: async (error) => {
       await Swal.fire({
         icon: "error",
         title: t("dialog.tripCompleteFail.title"),
-        text: error instanceof Error ? error.message : t("dialog.tripCompleteFail.text")
+        text: getApiErrorMessage(error, t("dialog.tripCompleteFail.text"))
       });
     }
   });
@@ -74,13 +77,15 @@ const TripsTable = ({ trips, onSuccess }: TripsTableProps) => {
         timer: 1600,
         showConfirmButton: false
       });
-      onSuccess?.();
+      try {
+        await onSuccess?.();
+      } catch {}
     },
     onError: async (error) => {
       await Swal.fire({
         icon: "error",
         title: t("dialog.breakdownFail.title"),
-        text: error instanceof Error ? error.message : t("dialog.breakdownFail.text")
+        text: getApiErrorMessage(error, t("dialog.breakdownFail.text"))
       });
     }
   });
@@ -95,13 +100,15 @@ const TripsTable = ({ trips, onSuccess }: TripsTableProps) => {
         timer: 1600,
         showConfirmButton: false
       });
-      onSuccess?.();
+      try {
+        await onSuccess?.();
+      } catch {}
     },
     onError: async (error) => {
       await Swal.fire({
         icon: "error",
         title: t("dialog.repairFail.title"),
-        text: error instanceof Error ? error.message : t("dialog.repairFail.text")
+        text: getApiErrorMessage(error, t("dialog.repairFail.text"))
       });
     }
   });

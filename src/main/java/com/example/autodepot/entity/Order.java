@@ -1,7 +1,9 @@
 package com.example.autodepot.entity;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -10,6 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Order {
+    @Getter(AccessLevel.NONE)
     private Long id;
     private String destination;
     private String cargoType;
@@ -18,5 +21,9 @@ public class Order {
 
     public Order(String destination, String cargoType, double weight) {
         this(null, destination, cargoType, weight, LocalDateTime.now());
+    }
+
+    public Long getId() {
+        return id;
     }
 }

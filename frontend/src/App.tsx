@@ -8,12 +8,13 @@ import OrdersTable from "./components/OrdersTable";
 import StatCard from "./components/StatCard";
 import TopBar from "./components/TopBar";
 import TripsTable from "./components/TripsTable";
-import { createDriver, createOrder, generateOrder } from "./api/dashboardApi";
+import { createDriver, createOrder, generateOrder, updateDriver } from "./api/dashboardApi";
 import { useDashboardData } from "./hooks/useDashboardData";
 import { useI18n } from "./i18n";
 import { DEFAULT_ERRORS_POLICY } from "./types/errors";
 import {
   buildAddDriverHtml,
+  buildEditDriverHtml,
   buildNewOrderHtml,
   getAddDriverFormValues,
   getApiErrorMessage,
@@ -199,6 +200,59 @@ const App = () => {
     }
   };
 
+  const handleEditDriver = async (driver: {
+    driverId?: number;
+    driverName: string;
+    licenseCategories?: string[];
+    licenseYear?: number;
+    experience?: number;
+  }) => {
+    if (driver.driverId == null) return;
+    const nowYear = new Date().getFullYear();
+    const licenseYear =
+      driver.licenseYear ?? (driver.experience != null ? nowYear - driver.experience : nowYear);
+    const result = await Swal.fire({
+      title: t("dialog.editDriver.title"),
+      html: buildEditDriverHtml(t, nowYear, {
+        driverName: driver.driverName,
+        licenseCategories: driver.licenseCategories ?? [],
+        licenseYear
+      }),
+      focusConfirm: false,
+      showCancelButton: true,
+      preConfirm: () =>
+        getAddDriverFormValues(
+          Swal.getPopup(),
+          nowYear,
+          t("dialog.addDriver.validation"),
+          Swal
+        )
+    });
+    if (!result.isConfirmed || !result.value) return;
+    try {
+      await updateDriver(driver.driverId, result.value);
+    } catch (err: unknown) {
+      await Swal.fire({
+        icon: "error",
+        title: t("dialog.editDriver.fail.title"),
+        text: getApiErrorMessage(err, t("dialog.editDriver.fail.text")) ?? t("dialog.editDriver.fail.text")
+      });
+      return;
+    }
+    try {
+      await Swal.fire({
+        icon: "success",
+        title: t("dialog.editDriver.success.title"),
+        text: t("dialog.editDriver.success.text"),
+        timer: 1600,
+        showConfirmButton: false
+      });
+      await refetch();
+    } catch {
+      refetch();
+    }
+  };
+
   const stats = data?.stats ?? [];
 
   return (
@@ -242,7 +296,7 @@ const App = () => {
         </section>
 
         <section className="grid">
-          <DriversTable drivers={data?.driverPerformance ?? []} onAddDriver={handleAddDriver} />
+          <DriversTable drivers={data?.driverPerformance ?? []} onAddDriver={handleAddDriver} onEditDriver={handleEditDriver} />
         </section>
 
         <section className="grid">

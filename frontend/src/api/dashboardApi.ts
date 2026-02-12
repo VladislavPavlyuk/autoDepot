@@ -61,6 +61,17 @@ export const createDriver = async (payload: CreateDriverPayload): Promise<void> 
   });
 };
 
+export const updateDriver = async (id: number, payload: CreateDriverPayload): Promise<void> => {
+  const body = {
+    name: payload.name,
+    licenseYear: Number(payload.licenseYear),
+    licenseCategories: Array.isArray(payload.licenseCategories) ? payload.licenseCategories : []
+  };
+  await client.patch(`/drivers/${id}`, body, {
+    headers: { "Content-Type": "application/json" }
+  });
+};
+
 export const assignTrip = async (orderId: number): Promise<void> => {
   await client.post("/trips/assign", { orderId });
 };

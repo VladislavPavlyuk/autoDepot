@@ -1,6 +1,7 @@
 package com.example.autodepot.controller;
 
 import com.example.autodepot.dto.DashboardResponseDTO;
+import com.example.autodepot.dto.DriverCreateDTO;
 import com.example.autodepot.dto.OrderDTO;
 import com.example.autodepot.dto.TripAssignDTO;
 import com.example.autodepot.dto.TripBreakdownDTO;
@@ -56,6 +57,12 @@ public class FleetApiController {
         var dto = driverApplicationService.parseDriverPayload(rawBytes);
         driverApplicationService.createDriver(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "created"));
+    }
+
+    @PatchMapping("/drivers/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateDriver(@PathVariable Long id, @RequestBody DriverCreateDTO dto) {
+        driverApplicationService.updateDriver(id, dto);
     }
 
     @PostMapping("/orders")

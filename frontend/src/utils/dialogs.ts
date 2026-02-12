@@ -150,3 +150,25 @@ export function buildAddDriverHtml(t: (key: string) => string, nowYear: number):
     </select>`
   );
 }
+
+export function buildEditDriverHtml(
+  t: (key: string) => string,
+  nowYear: number,
+  driver: { driverName: string; licenseCategories?: string[]; licenseYear?: number }
+): string {
+  const yearOptions = Array.from({ length: nowYear - 1969 }, (_, i) => String(1970 + i));
+  const categories = ["A", "B", "C", "D", "E"];
+  const selectedCats = new Set((driver.licenseCategories ?? []).map((c) => c.toUpperCase()));
+  const licenseYear = driver.licenseYear ?? nowYear;
+  return (
+    `<input id="driver-name" class="swal2-input" placeholder="${escapeHtml(t("dialog.addDriver.name"))}" value="${escapeHtml(driver.driverName)}">` +
+    `<div class="driver-categories" style="text-align:left; margin: 1rem 0;">
+      <p style="margin:0 0 8px; font-size: 0.9em; color: var(--muted);">${escapeHtml(t("dialog.addDriver.licenseCategory"))}</p>
+      ${categories.map((cat) => `<label style="display:inline-block; margin-right: 1rem;"><input type="checkbox" name="driver-cat" value="${cat}" ${selectedCats.has(cat) ? "checked" : ""}> ${cat}</label>`).join("")}
+    </div>` +
+    `<select id="driver-license-year" class="swal2-select">
+      <option value="">${escapeHtml(t("dialog.addDriver.selectYear"))}</option>
+      ${yearOptions.map((y) => `<option value="${y}" ${y === String(licenseYear) ? "selected" : ""}>${y}</option>`).join("")}
+    </select>`
+  );
+}

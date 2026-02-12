@@ -5,9 +5,10 @@ import { useI18n } from "../i18n";
 type DriversTableProps = {
   drivers: DriverStat[];
   onAddDriver?: () => void;
+  onEditDriver?: (driver: DriverStat) => void;
 };
 
-const DriversTable = ({ drivers, onAddDriver }: DriversTableProps) => {
+const DriversTable = ({ drivers, onAddDriver, onEditDriver }: DriversTableProps) => {
   const { t, language } = useI18n();
   const sortedDrivers = useMemo(() => {
     return [...drivers].sort((a, b) => b.earnings - a.earnings);
@@ -45,15 +46,28 @@ const DriversTable = ({ drivers, onAddDriver }: DriversTableProps) => {
           <span>{t("drivers.col.trips")}</span>
           <span>{t("drivers.col.weight")}</span>
           <span>{t("drivers.col.earnings")}</span>
+          {onEditDriver && <span className="drivers-actions-head" />}
         </div>
-        {sortedDrivers.map((driver, index) => (
-          <div key={driver.driverName} className="table-row drivers">
+        {sortedDrivers.map((driver) => (
+          <div key={driver.driverId ?? driver.driverName} className="table-row drivers">
             <span>{driver.driverName}</span>
             <span>{(driver.licenseCategories ?? []).join(", ")}</span>
             <span>{driver.experience}</span>
             <span>{driver.tripCount}</span>
             <span>{formatWeight(driver.totalWeight)}</span>
             <span>{formatMoney(driver.earnings)}</span>
+            {onEditDriver && driver.driverId != null && (
+              <span className="drivers-actions">
+                <button
+                  type="button"
+                  className="button ghost tiny"
+                  onClick={() => onEditDriver(driver)}
+                  title={t("drivers.edit")}
+                >
+                  {t("drivers.edit")}
+                </button>
+              </span>
+            )}
           </div>
         ))}
         {sortedDrivers.length === 0 && (

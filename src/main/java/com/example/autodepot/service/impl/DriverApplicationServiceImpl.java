@@ -4,6 +4,7 @@ import com.example.autodepot.dto.DriverCreateDTO;
 import com.example.autodepot.entity.Driver;
 import com.example.autodepot.exception.BadRequestException;
 import com.example.autodepot.service.DriverApplicationService;
+import com.example.autodepot.exception.NotFoundException;
 import com.example.autodepot.service.data.DriverService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
@@ -53,6 +54,38 @@ public class DriverApplicationServiceImpl implements DriverApplicationService {
         List<String> categories = validateAndNormalizeLicenseCategories(dto.getLicenseCategories());
         int licenseYear = validateLicenseYear(dto.getLicenseYear());
         Driver driver = toDriverEntity(name, licenseYear, categories);
+        driverService.save(driver);
+    }
+
+    @Override
+    public void updateDriver(Long id, DriverCreateDTO dto) {
+        if (dto == null) {
+            throw new BadRequestException("Driver payload is required");
+        }
+        Driver driver = driverService.findById(id)
+            .orElseThrow(() -> new NotFoundException("Driver not found: " + id));
+        String name = validateDriverName(dto.getName());
+        List<String> categories = validateAndNormalizeLicenseCategories(dto.getLicenseCategories());
+        int licenseYear = validateLicenseYear(dto.getLicenseYear());
+        driver.setName(name);
+        driver.setLicenseYear(licenseYear);
+        driver.setLicenseCategories(categories);
+        driverService.save(driver);
+    }
+
+    @Override
+    public void updateDriver(Long id, DriverCreateDTO dto) {
+        if (dto == null) {
+            throw new BadRequestException("Driver payload is required");
+        }
+        Driver driver = driverService.findById(id)
+            .orElseThrow(() -> new NotFoundException("Driver not found: " + id));
+        String name = validateDriverName(dto.getName());
+        List<String> categories = validateAndNormalizeLicenseCategories(dto.getLicenseCategories());
+        int licenseYear = validateLicenseYear(dto.getLicenseYear());
+        driver.setName(name);
+        driver.setLicenseYear(licenseYear);
+        driver.setLicenseCategories(categories);
         driverService.save(driver);
     }
 

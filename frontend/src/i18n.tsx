@@ -121,7 +121,13 @@ const translations: Record<Language, Dictionary> = {
     "license.category.D": "D",
     "license.category.E": "E",
     "drivers.col.category": "Категорія",
-    "drivers.col.experience": "Стаж"
+    "drivers.col.experience": "Стаж",
+    "drivers.edit": "Редагувати",
+    "dialog.editDriver.title": "Редагування водія",
+    "dialog.editDriver.success.title": "Водія оновлено",
+    "dialog.editDriver.success.text": "Профіль водія збережено.",
+    "dialog.editDriver.fail.title": "Помилка",
+    "dialog.editDriver.fail.text": "Не вдалося оновити водія."
   },
   en: {
     "app.name": "AutoDepot",
@@ -239,7 +245,13 @@ const translations: Record<Language, Dictionary> = {
     "license.category.D": "D",
     "license.category.E": "E",
     "drivers.col.category": "Category",
-    "drivers.col.experience": "Experience"
+    "drivers.col.experience": "Experience",
+    "drivers.edit": "Edit",
+    "dialog.editDriver.title": "Edit driver",
+    "dialog.editDriver.success.title": "Driver updated",
+    "dialog.editDriver.success.text": "Driver profile saved.",
+    "dialog.editDriver.fail.title": "Error",
+    "dialog.editDriver.fail.text": "Failed to update driver."
   }
 };
 

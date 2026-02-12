@@ -5,12 +5,14 @@ export type StatCard = {
 };
 
 export type DriverStat = {
+  driverId?: number;
   driverName: string;
   tripCount: number;
   totalWeight: number;
   earnings: number;
   licenseCategories: string[];
   experience: number;
+  licenseYear?: number;
 };
 
 export type OrderStatus = "QUEUED" | "ASSIGNED" | "READY";

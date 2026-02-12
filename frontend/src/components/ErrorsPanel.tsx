@@ -7,7 +7,6 @@ type ErrorsPanelProps = {
   onClose: () => void;
 };
 
-/** UTC ms or ISO string → local date/time */
 function formatDate(isoOrMillis: string | number): string {
   const ms = typeof isoOrMillis === "number" ? isoOrMillis : new Date(isoOrMillis).getTime();
   if (Number.isNaN(ms)) return String(isoOrMillis);

@@ -7,10 +7,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/**
- * Centralized exception handling for Thymeleaf / fleet MVC controllers.
- * Exceptions are converted to redirect with flash message and recorded in the audit log.
- */
+/** Catches FleetController errors. */
 @ControllerAdvice(assignableTypes = FleetController.class)
 public class FleetControllerAdvice {
 

@@ -6,9 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 
-/**
- * Centralized exception registry. Persists to DB via ErrorAuditService.
- */
+/** Saves errors to the database. */
 @Component
 public class ExceptionCollector {
 

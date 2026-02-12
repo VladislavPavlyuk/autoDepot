@@ -15,13 +15,9 @@ export type ErrorsPage = {
   size: number;
 };
 
-/** Policy for which errors to show by default (filter presets). */
 export type ErrorsFilterPolicy = {
-  /** Default "since" in hours; null = no default time filter. */
   defaultMaxAgeHours: number | null;
-  /** Allowed exception types for filter dropdown; null = allow any (from API). */
   allowedExceptionTypes: string[] | null;
-  /** Page size for list. */
   pageSize: number;
 };
 

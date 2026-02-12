@@ -15,10 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
 
-/**
- * Centralized exception handling for REST API (/api/**).
- * All API exceptions are converted to JSON { "message": "..." } here and recorded in the audit log.
- */
+/** Catches API errors and returns JSON. */
 @RestControllerAdvice
 public class ApiExceptionHandler {
 

@@ -47,7 +47,7 @@ public class DriverCreateDTO {
         this.licenseCategories = licenseCategories;
     }
 
-    /** Accepts JSON array of strings or a single string. */
+    /** Can take array or single string. */
     public static class LicenseCategoriesDeserializer extends JsonDeserializer<List<String>> {
         @Override
         public List<String> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {

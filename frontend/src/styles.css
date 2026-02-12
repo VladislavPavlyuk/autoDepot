@@ -455,7 +455,6 @@ body {
   }
 }
 
-/* Errors audit panel (overlay) */
 .errors-panel-overlay {
   position: fixed;
   inset: 0;

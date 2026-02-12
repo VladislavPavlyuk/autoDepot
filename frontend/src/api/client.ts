@@ -16,7 +16,7 @@ function getMessageFromResponse(data: unknown): string | null {
       const parsed = JSON.parse(data) as { message?: unknown };
       if (parsed && typeof parsed.message === "string") return parsed.message;
     } catch {
-      // ignore
+      /* ignore */
     }
     return data;
   }

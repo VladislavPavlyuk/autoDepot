@@ -5,10 +5,10 @@ Dispatcher dashboard for managing orders, trips, drivers, and vehicles. Supports
 ## Architecture
 
 ```
-┌─────────────┐     ┌─────────┐     ┌──────────────┐     ┌────────────┐
+┌─────────────┐     ┌──────────┐     ┌──────────────┐     ┌────────────┐
 │   nginx     │────▶│ frontend │────▶│   backend    │────▶│ PostgreSQL │
 │   (port 80) │     │   (Vite) │     │ (Spring Boot)│     │    :5432   │
-└─────────────┘     └─────────┘     └──────────────┘     └────────────┘
+└─────────────┘     └──────────┘     └──────────────┘     └────────────┘
 ```
 
 ### Backend (Spring Boot)
@@ -43,18 +43,18 @@ Main flows:
 
 ## Technologies
 
-| Layer    | Technology |
-|----------|------------|
-| Backend  | Java 19, Spring Boot 4.0 |
-| Web      | Spring MVC, Thymeleaf (server-side) |
-| Security | Spring Security, form login |
-| DB       | PostgreSQL 16, JDBC |
-| ORM      | Spring JDBC (no JPA) |
-| Migrations | Flyway |
-| Mapping | MapStruct |
-| Frontend | React 18, TypeScript, Vite |
-| Data     | TanStack Query, Axios |
-| Tests    | JUnit 5, Mockito, Testcontainers |
+| Layer      | Technology                          |
+|------------|-------------------------------------|
+| Backend    | Java 19, Spring Boot 4.0            |
+| Web        | Spring MVC, Thymeleaf (server-side) |
+| Security   | Spring Security, form login         |
+| DB         | PostgreSQL 16, JDBC                 |
+| ORM        | Spring JDBC (no JPA)                |
+| Migrations | Flyway                              |
+| Mapping    | MapStruct                           |
+| Frontend   | React 18, TypeScript, Vite          |
+| Data       | TanStack Query, Axios               |
+| Tests      | JUnit 5, Mockito, Testcontainers    |
 
 ## Run
 

@@ -30,7 +30,7 @@ client.interceptors.response.use(
     (err as Error & { serverMessage?: string }).serverMessage = msg;
     if (err.response?.status === 401) {
       window.location.href = "/login";
-      return Promise.reject(err);
+      return new Promise(() => {});
     }
     return Promise.reject(err);
   }
